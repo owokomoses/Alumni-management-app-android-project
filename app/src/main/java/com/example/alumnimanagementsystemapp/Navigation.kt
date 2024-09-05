@@ -13,7 +13,7 @@ fun Navigation(modifier: Modifier = Modifier){
 
     NavHost(navController = navController, startDestination = "login", builder = {
         composable("login"){
-            LoginPage(modifier)
+            LoginPage(modifier,navController)
         }
     })
 
