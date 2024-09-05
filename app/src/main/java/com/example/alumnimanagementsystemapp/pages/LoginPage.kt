@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,5 +72,11 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+        
+        TextButton(onClick = {
+            navController.navigate("signup")
+        }) {
+            Text(text = "Don't have an account, Signup")
+        }
     }
 }
