@@ -2,8 +2,10 @@ package com.example.alumnimanagementsystemapp.pages
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import com.example.alumnimanagementsystemapp.AuthViewModel
 
 @Composable
-fun SignupPage(modifier: Modifier = Modifier){
+fun SignupPage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel){
 
 }
