@@ -76,7 +76,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
         TextButton(onClick = {
             navController.navigate("signup")
         }) {
-            Text(text = "Don't have an account, Signup")
+            Text(text = "Don't have an account? Signup")
         }
     }
 }

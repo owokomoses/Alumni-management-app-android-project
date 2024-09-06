@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1092883911068",
+    "project_id": "crud-app-690ef",
+    "storage_bucket": "crud-app-690ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092883911068:android:1e4628a3907fc0e588f859",
+        "android_client_info": {
+          "package_name": "com.example.alumnimanagementsystemapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA5Rt-KuCRz_c48qoS6HIwHj6ZeMap_xM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092883911068:android:f39b9dd164cb7d2b88f859",
+        "android_client_info": {
+          "package_name": "com.example.hotelloginsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA5Rt-KuCRz_c48qoS6HIwHj6ZeMap_xM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

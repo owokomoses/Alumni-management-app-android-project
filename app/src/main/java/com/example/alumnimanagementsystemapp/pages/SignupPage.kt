@@ -3,6 +3,7 @@ package com.example.alumnimanagementsystemapp.pages
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -16,8 +17,11 @@ fun SignupPage(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val authState = authViewModel.authState.observeAsState()
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -27,6 +31,14 @@ fun SignupPage(
         Text(text = "Signup Page", fontSize = 32.sp)
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text(text = "Username") }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = email,
