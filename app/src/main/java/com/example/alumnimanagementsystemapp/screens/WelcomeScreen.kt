@@ -18,6 +18,10 @@ fun WelcomeScreen(navController: NavController) {
     LaunchedEffect(key1 = true) {
         delay(3000L) // Wait for 3 seconds
         navController.navigate("login") // Navigate to the login screen
+
+        navController.navigate("login") {
+            popUpTo("welcome") { inclusive = true }
+        }
     }
 
     // Display the image in the center
