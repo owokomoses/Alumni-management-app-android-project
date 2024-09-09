@@ -1,62 +1,33 @@
 {
   "project_info": {
-    "project_number": "1092883911068",
-    "project_id": "crud-app-690ef",
-    "storage_bucket": "crud-app-690ef.appspot.com"
+    "project_number": "1026771214952",
+    "project_id": "alumni-management-system-195cc",
+    "storage_bucket": "alumni-management-system-195cc.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1092883911068:android:1e4628a3907fc0e588f859",
+        "mobilesdk_app_id": "1:1026771214952:android:42246fc1137befbe3691dd",
         "android_client_info": {
           "package_name": "com.example.alumnimanagementsystemapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+          "client_id": "1026771214952-7ikg8hpdjuu810jqps8ku4le72l0t4t8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBA5Rt-KuCRz_c48qoS6HIwHj6ZeMap_xM"
+          "current_key": "AIzaSyBQ6aWb-X0eWcuCp8g_ELJN4C34pWxnab0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:1092883911068:android:f39b9dd164cb7d2b88f859",
-        "android_client_info": {
-          "package_name": "com.example.hotelloginsystem"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBA5Rt-KuCRz_c48qoS6HIwHj6ZeMap_xM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1092883911068-2r5bge769s46b89v74jgaac62lsckej5.apps.googleusercontent.com",
+              "client_id": "1026771214952-7ikg8hpdjuu810jqps8ku4le72l0t4t8.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

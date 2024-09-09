@@ -1,14 +1,17 @@
 package com.example.alumnimanagementsystemapp.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 
 @Composable
@@ -17,11 +20,23 @@ fun SignupPage(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
-    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val authState = authViewModel.authState.observeAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Authenticated -> navController.navigate("home")
+            is AuthState.Error -> Toast.makeText(
+                context,
+                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
+            ).show()
+
+            else -> Unit
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -29,14 +44,6 @@ fun SignupPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = "Signup Page", fontSize = 32.sp)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text(text = "Username") }
-        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -57,7 +64,7 @@ fun SignupPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            // Trigger authentication through authViewModel
+            authViewModel.signup(email,password)
         }) {
             Text(text = "Create account")
         }
