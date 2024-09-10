@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -68,8 +71,8 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Login Page", fontSize = 32.sp)
-        
+        Text(text = "Login", fontSize = 32.sp, color = Color.Red)
+
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -78,8 +81,14 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 email = it
         },
             label ={
-                Text(text = "Email")
-            }
+                Text(text = "Email", color = Color.Red)
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+
+            ),
+            textStyle = TextStyle(color = Color.Black)
             )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -90,26 +99,35 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 password = it
             },
             label ={
-                Text(text = "Password")
-            }
+                Text(text = "Password", color = Color.Red)
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray
+            ),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Button(onClick = {
             authViewModel.login(email,password)
         },
-            enabled = authState.value != AuthState.Loading
+            enabled = authState.value != AuthState.Loading,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+
             ) {
-            Text(text = "Login")
+            Text(text = "Login", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         TextButton(onClick = {
             navController.navigate("signup")
-        }) {
-            Text(text = "Don't have an account? Signup")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+            Text(text = "Don't have an account? Signup", color = Color.Red)
         }
     }
 }
