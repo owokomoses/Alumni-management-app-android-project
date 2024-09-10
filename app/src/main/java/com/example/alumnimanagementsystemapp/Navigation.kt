@@ -12,56 +12,69 @@ import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
+import kotlinx.coroutines.delay
 
 @Composable
-fun Navigation(modifier: Modifier = Modifier,authViewModel: AuthViewModel){
+fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
     val navController = rememberNavController()
     val authState = authViewModel.authState.observeAsState()
 
-    // Check the user's authentication state at the start
-    LaunchedEffect(authState.value) {
-        when (authState.value) {
-            is AuthState.Authenticated -> {
-                // Navigate to Home if already authenticated
-                navController.navigate("home") {
-                    popUpTo("welcome") { inclusive = true }
-                }
-            }
-            is AuthState.Unauthenticated -> {
-                // If unauthenticated, navigate to loginScreen
-                navController.navigate("loginScreen") {
-                    popUpTo("welcome") { inclusive = true }
-                }
-            }
-            else -> {
-                // Show Welcome Screen by default
-                navController.navigate("welcome") {
-                    popUpTo("welcome") { inclusive = true }
+    NavHost(navController = navController, startDestination = "welcome") {
+        composable("welcome") {
+            WelcomeScreen(navController = navController)
+
+            LaunchedEffect(Unit) {
+                delay(3000)
+                when (authState.value) {
+                    is AuthState.Authenticated -> {
+                        navController.navigate("home") {
+                            popUpTo("welcome") { inclusive = true }
+                        }
+                    }
+                    is AuthState.Unauthenticated -> {
+                        navController.navigate("login") {
+                            popUpTo("welcome") { inclusive = true }
+                        }
+                    }
+                    else -> {
+                        // Default case: If state is unclear, stay on welcome
+                    }
                 }
             }
         }
-    }
 
-    NavHost(navController = navController, startDestination = "welcome", builder = {
+        composable("login") {
+            LoginPage(modifier, navController, authViewModel)
 
-        composable("welcome") { WelcomeScreen(navController = navController)
-        }
-
-        composable("login"){
-            LoginPage(modifier,navController,authViewModel)
+            LaunchedEffect(authState.value) {
+                if (authState.value is AuthState.Authenticated) {
+                    navController.navigate("loginScreen") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            }
         }
 
         composable("loginScreen") {
             LoginScreen(navController = navController, authViewModel = authViewModel)
+
+            LaunchedEffect(authState.value) {
+                if (authState.value is AuthState.Authenticated) {
+                    // Delay for 3 seconds before navigating to HomePage
+                    delay(3000)
+                    navController.navigate("home") {
+                        popUpTo("loginScreen") { inclusive = true }
+                    }
+                }
+            }
         }
 
-        composable("signup"){
-            SignupPage(modifier,navController,authViewModel)
+        composable("signup") {
+            SignupPage(modifier, navController, authViewModel)
         }
 
-        composable("home"){
-            HomePage(modifier,navController,authViewModel)
+        composable("home") {
+            HomePage(modifier, navController, authViewModel)
         }
-    })
-
+    }
 }

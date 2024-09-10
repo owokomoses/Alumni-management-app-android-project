@@ -42,7 +42,10 @@ fun SignupPage(
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate("home")
+            is AuthState.Authenticated -> navController.navigate("home"){
+                // Remove SignupPage from the back stack
+                popUpTo("signup") { inclusive = true }
+            }
             is AuthState.Error -> Toast.makeText(
                 context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
@@ -62,6 +65,8 @@ fun SignupPage(
             contentDescription = "Login Icon",
             modifier = Modifier.size(100.dp) // Adjust the size as necessary
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Signup", fontSize = 32.sp, color = Color.Red)
 

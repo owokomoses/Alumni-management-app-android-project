@@ -56,6 +56,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+
     LaunchedEffect(authState.value) {
         when(authState.value){
             is AuthState.Authenticated -> navController.navigate("loginScreen"){
