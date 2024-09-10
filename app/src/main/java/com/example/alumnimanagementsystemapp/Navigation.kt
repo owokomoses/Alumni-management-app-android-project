@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.HomePage
 import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.SignupPage
+import com.example.alumnimanagementsystemapp.screens.LoginScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
 
 @Composable
@@ -21,6 +22,10 @@ fun Navigation(modifier: Modifier = Modifier,authViewModel: AuthViewModel){
 
         composable("login"){
             LoginPage(modifier,navController,authViewModel)
+        }
+
+        composable("loginScreen") {
+            LoginScreen(navController = navController, authViewModel = authViewModel)
         }
 
         composable("signup"){

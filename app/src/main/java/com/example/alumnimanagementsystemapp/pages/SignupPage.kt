@@ -9,6 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -27,7 +30,12 @@ fun SignupPage(
     authViewModel: AuthViewModel
 ) {
     var email by remember { mutableStateOf("") }
+
     var password by remember { mutableStateOf("") }
+
+    var emailIsFocused by remember { mutableStateOf(false) }
+
+    val focusRequester = remember { FocusRequester() }
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
@@ -62,13 +70,23 @@ fun SignupPage(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(text = "Email", color = Color.Red)
+            label = {
+                Text(
+                    text = "Email",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Gray
                 ),
-            textStyle = TextStyle(color = Color.Black)
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -76,13 +94,23 @@ fun SignupPage(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(text = "Password",color = Color.Red)
+            label = {
+                Text(
+                    text = "Password",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Gray
                 ),
-            textStyle = TextStyle(color = Color.Black)
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

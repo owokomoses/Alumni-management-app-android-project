@@ -24,6 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,12 +49,18 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
         mutableStateOf("")
     }
 
+    var emailIsFocused by remember { mutableStateOf(false) }
+
+    val focusRequester = remember { FocusRequester() }
+
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
     LaunchedEffect(authState.value) {
         when(authState.value){
-            is AuthState.Authenticated -> navController.navigate("home")
+            is AuthState.Authenticated -> navController.navigate("loginScreen"){
+                popUpTo("login") { inclusive = true }
+            }
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
@@ -81,14 +90,23 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 email = it
         },
             label ={
-                Text(text = "Email", color = Color.Red)
+                Text(
+                    text = "Email",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
+
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
-
+                cursorColor = Color.Gray
             ),
-            textStyle = TextStyle(color = Color.Black)
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
             )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -99,13 +117,22 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 password = it
             },
             label ={
-                Text(text = "Password", color = Color.Red)
+                Text(
+                    text = "Password",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
             },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
-                unfocusedBorderColor = Color.Gray
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Gray
             ),
-            textStyle = TextStyle(color = Color.Black)
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
