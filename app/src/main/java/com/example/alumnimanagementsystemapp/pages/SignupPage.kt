@@ -1,18 +1,24 @@
 package com.example.alumnimanagementsystemapp.pages
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
+import com.example.alumnimanagementsystemapp.R
 
 @Composable
 fun SignupPage(
@@ -39,18 +45,30 @@ fun SignupPage(
     }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(Color.White),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = "Signup Page", fontSize = 32.sp)
+        Image(
+            painter = painterResource(id = R.drawable.icon), // Replace with your image resource
+            contentDescription = "Login Icon",
+            modifier = Modifier.size(100.dp) // Adjust the size as necessary
+        )
+
+        Text(text = "Signup", fontSize = 32.sp, color = Color.Red)
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(text = "Email") }
+            label = { Text(text = "Email", color = Color.Red)
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+                ),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -58,23 +76,33 @@ fun SignupPage(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(text = "Password") }
+            label = { Text(text = "Password",color = Color.Red)
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+                ),
+            textStyle = TextStyle(color = Color.Black)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
             authViewModel.signup(email,password)
-        }) {
-            Text(text = "Create account")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+            Text(text = "Create account", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(onClick = {
             navController.navigate("login")
-        }) {
-            Text(text = "Already have an account? Login")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+            Text(text = "Already have an account? Login", color = Color.Red)
         }
     }
 }
