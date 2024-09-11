@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1026771214952-bjf1nflvhbkqvn0o4nh2609j2eq89iih.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.alumnimanagementsystemapp",
+            "certificate_hash": "de9cfc878297961dc6f65b762c5ca0bf1881ddb0"
+          }
+        },
+        {
           "client_id": "1026771214952-7ikg8hpdjuu810jqps8ku4le72l0t4t8.apps.googleusercontent.com",
           "client_type": 3
         }
