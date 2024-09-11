@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.R
@@ -31,7 +32,10 @@ fun WelcomeScreen(navController: NavController) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.welcome), // Replace with your image resource
-            contentDescription = "Welcome Image"
+            contentDescription = "Welcome Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+
         )
     }
 }
