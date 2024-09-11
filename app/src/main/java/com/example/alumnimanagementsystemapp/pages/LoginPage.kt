@@ -107,7 +107,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
     val context = LocalContext.current
 
 
-    LaunchedEffect(authState.value) {
+    LaunchedEffect(authState.value, user) {
         when(authState.value){
             is AuthState.Authenticated -> navController.navigate("loginScreen"){
                 popUpTo("login") { inclusive = true }

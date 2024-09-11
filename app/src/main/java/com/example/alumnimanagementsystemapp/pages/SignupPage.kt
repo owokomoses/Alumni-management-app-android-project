@@ -38,6 +38,10 @@ fun SignupPage(
 
     var password by remember { mutableStateOf("") }
 
+    var confirmPassword by remember { mutableStateOf("") }
+
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+
     var passwordVisible by remember {
         mutableStateOf(false)
     }
@@ -139,10 +143,50 @@ fun SignupPage(
             textStyle = TextStyle(color = Color.Gray)
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = {
+                Text(
+                    text = "Confirm Password",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
+            },
+            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = {
+                    confirmPasswordVisible = !confirmPasswordVisible
+                }) {
+                    Icon(
+                        imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
+                        tint = Color.Red
+                    )
+                }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Red
+            ),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
+            if (password == confirmPassword) {
             authViewModel.signup(email,password)
+            } else {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
