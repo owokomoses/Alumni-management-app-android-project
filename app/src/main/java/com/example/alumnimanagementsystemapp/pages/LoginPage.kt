@@ -9,8 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -32,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -48,6 +54,10 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
 
     var password by remember{
         mutableStateOf("")
+    }
+
+    var passwordVisible by remember {
+        mutableStateOf(false)
     }
 
     var emailIsFocused by remember { mutableStateOf(false) }
@@ -101,7 +111,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Gray
+                cursorColor = Color.Red
             ),
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -124,12 +134,23 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     color = if (emailIsFocused) Color.Red else Color.Gray
                 )
             },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = {
+                    passwordVisible = !passwordVisible
+                }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                        tint = Color.Red
+                    )
+                }
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Gray
+                cursorColor = Color.Red
             ),
-            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->

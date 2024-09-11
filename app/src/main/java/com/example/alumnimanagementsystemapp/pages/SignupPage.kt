@@ -85,7 +85,7 @@ fun SignupPage(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Gray
+                cursorColor = Color.Red
                 ),
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -109,7 +109,7 @@ fun SignupPage(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Gray
+                cursorColor = Color.Red
                 ),
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
