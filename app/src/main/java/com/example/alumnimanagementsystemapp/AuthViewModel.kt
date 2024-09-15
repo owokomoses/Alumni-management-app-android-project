@@ -3,7 +3,12 @@ package com.example.alumnimanagementsystemapp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -75,6 +80,19 @@ class AuthViewModel : ViewModel() {
                 }
         } else {
             _authState.value = AuthState.Error("No user logged in")
+        }
+    }
+
+    fun resetPassword(newPassword: String) {
+        viewModelScope.launch {
+            try {
+                // Assuming you have Firebase Auth instance initialized
+                val user = Firebase.auth.currentUser
+                user?.updatePassword(newPassword)?.await()
+                _authState.postValue(AuthState.Authenticated) // Update your state accordingly
+            } catch (e: Exception) {
+                _authState.postValue(AuthState.Error(e.message ?: "An error occurred"))
+            }
         }
     }
 
