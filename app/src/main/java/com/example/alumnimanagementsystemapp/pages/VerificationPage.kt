@@ -44,6 +44,7 @@ fun VerificationPage(
     val context = LocalContext.current
 
 
+
     Column(
         modifier = modifier.fillMaxSize().background(Color.White),
         verticalArrangement = Arrangement.Center,
