@@ -83,13 +83,17 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun resetPassword(newPassword: String) {
+    fun resetPassword(email: String) {
         viewModelScope.launch {
             try {
-                // Assuming you have Firebase Auth instance initialized
-                val user = Firebase.auth.currentUser
-                user?.updatePassword(newPassword)?.await()
-                _authState.postValue(AuthState.Authenticated) // Update your state accordingly
+                val auth = Firebase.auth
+                auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _authState.postValue(AuthState.Authenticated) // or another state indicating success
+                    } else {
+                        _authState.postValue(AuthState.Error(task.exception?.message ?: "An error occurred"))
+                    }
+                }
             } catch (e: Exception) {
                 _authState.postValue(AuthState.Error(e.message ?: "An error occurred"))
             }

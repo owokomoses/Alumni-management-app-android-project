@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,8 @@ fun ForgotPasswordPage(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
+    var email by remember { mutableStateOf("") }
+
     var password by remember { mutableStateOf("") }
 
     var confirmPassword by remember { mutableStateOf("") }
@@ -71,7 +75,7 @@ fun ForgotPasswordPage(
     ) {
         Image(
             painter = painterResource(id = R.drawable.icon), // Replace with your image resource
-            contentDescription = "Login Icon",
+            contentDescription = "Reset password Icon",
             modifier = Modifier.size(100.dp) // Adjust the size as necessary
         )
 
@@ -80,6 +84,30 @@ fun ForgotPasswordPage(
         Text(text = "Reset Password", fontSize = 32.sp, color = Color.Red)
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = {
+                Text(
+                    text = "Email",
+                    color = if (emailIsFocused) Color.Red else Color.Gray
+                )
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Red
+            ),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .onFocusChanged { focusState ->
+                    emailIsFocused = focusState.isFocused
+                },
+            textStyle = TextStyle(color = Color.Gray)
+        )
+
 
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -157,7 +185,15 @@ fun ForgotPasswordPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-
+            if (password == confirmPassword) {
+                if (email.isNotEmpty()) {
+                    authViewModel.resetPassword(email, password)
+                } else {
+                    Toast.makeText(context, "Email cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
