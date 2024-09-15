@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.HomePage
 import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.SignupPage
+import com.example.alumnimanagementsystemapp.pages.VerificationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
 import kotlinx.coroutines.delay
@@ -68,6 +69,10 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("home") {
             HomePage(modifier, navController, authViewModel)
+        }
+
+        composable("verificationPage") {
+            VerificationPage(modifier, navController, authViewModel)
         }
     }
 }

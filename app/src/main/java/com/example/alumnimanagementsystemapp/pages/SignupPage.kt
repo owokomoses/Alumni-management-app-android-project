@@ -55,7 +55,7 @@ fun SignupPage(
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate("home"){
+            is AuthState.Authenticated -> navController.navigate("verificationPage"){
                 // Remove SignupPage from the back stack
                 popUpTo("signup") { inclusive = true }
             }
