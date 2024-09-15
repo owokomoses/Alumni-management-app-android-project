@@ -42,73 +42,80 @@ fun VerificationPage(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.VerificationEmailSent -> {
-                Toast.makeText(context, "Verification email sent. Please check your email.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Verification email sent. Please check your email.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 // Optionally, navigate to another page or handle the state
                 // For example, you might navigate to a login page:
                 navController.navigate("login") {
                     popUpTo("signup") { inclusive = true }
                 }
             }
+
             is AuthState.Error -> {
-                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT)
+                    .show()
             }
+
             else -> Unit
         }
     }
 
 
 
-
-
-    Column(
-        modifier = modifier.fillMaxSize().background(Color.White),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.icon), // Replace with your image resource
-            contentDescription = "Login Icon",
-            modifier = Modifier.size(100.dp) // Adjust the size as necessary
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "Verification", fontSize = 32.sp, color = Color.Red)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = {
-                Text(
-                    text = "Email",
-                    color = if (emailIsFocused) Color.Red else Color.Gray
-                )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Red
-            ),
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged { focusState ->
-                    emailIsFocused = focusState.isFocused
-                },
-            textStyle = TextStyle(color = Color.Gray)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            authViewModel.sendVerificationEmail()
-        },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        Column(
+            modifier = modifier.fillMaxSize().background(Color.White),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "Verify account", color = Color.Black)
+            Image(
+                painter = painterResource(id = R.drawable.icon), // Replace with your image resource
+                contentDescription = "Login Icon",
+                modifier = Modifier.size(100.dp) // Adjust the size as necessary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Verification", fontSize = 32.sp, color = Color.Red)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = {
+                    Text(
+                        text = "Email",
+                        color = if (emailIsFocused) Color.Red else Color.Gray
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Red,
+                    unfocusedBorderColor = Color.Gray,
+                    cursorColor = Color.Red
+                ),
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        emailIsFocused = focusState.isFocused
+                    },
+                textStyle = TextStyle(color = Color.Gray)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    authViewModel.sendVerificationEmail()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text(text = "Verify account", color = Color.Black)
+            }
+
+
         }
-
-
     }
-}
+

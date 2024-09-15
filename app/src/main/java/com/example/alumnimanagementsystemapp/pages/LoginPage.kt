@@ -206,6 +206,24 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             textStyle = TextStyle(color = Color.Gray)
         )
 
+        Spacer(modifier = Modifier.height(4.dp))
+
+        TextButton(onClick = {
+            navController.navigate("forgotPasswordPage")
+        }) {
+            Text(text = "Forgot Password?", color = Color.Red)
+        }
+
+
+
+        TextButton(onClick = {
+            navController.navigate("signup")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Text(text = "Don't have an account? Signup", color = Color.Red)
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
@@ -259,13 +277,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
         Spacer(modifier = Modifier.height(8.dp))
 
 
-        TextButton(onClick = {
-            navController.navigate("signup")
-        },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        ) {
-            Text(text = "Don't have an account? Signup", color = Color.Red)
-        }
+
     }
 }
 
