@@ -4,9 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,8 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -40,8 +35,28 @@ fun VerificationPage(
 
     val focusRequester = remember { FocusRequester() }
 
-    val authState = authViewModel.authState.observeAsState()
+    // Observe the authState LiveData
+    val authState by authViewModel.authState.observeAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.VerificationEmailSent -> {
+                Toast.makeText(context, "Verification email sent. Please check your inbox.", Toast.LENGTH_SHORT).show()
+                // Optionally, navigate to another page or handle the state
+                // For example, you might navigate to a login page:
+                navController.navigate("login") {
+                    popUpTo("signup") { inclusive = true }
+                }
+            }
+            is AuthState.Error -> {
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            }
+            else -> Unit
+        }
+    }
+
+
 
 
 
@@ -87,7 +102,7 @@ fun VerificationPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-
+            authViewModel.sendVerificationEmail()
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
