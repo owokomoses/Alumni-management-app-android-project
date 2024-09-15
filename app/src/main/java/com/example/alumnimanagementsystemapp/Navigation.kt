@@ -46,13 +46,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
         composable("login") {
             LoginPage(modifier, navController, authViewModel)
 
-            LaunchedEffect(authState.value) {
-                if (authState.value is AuthState.Authenticated) {
-                    navController.navigate("loginScreen") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                }
-            }
         }
 
         composable("loginScreen") {

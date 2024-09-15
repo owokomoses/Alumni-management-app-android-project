@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AlumniManagementSystemApp"
         tools:targetApi="31">
+
+        <!-- MainActivity declaration -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -21,13 +23,17 @@
             android:theme="@style/Theme.AlumniManagementSystemApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version" />
-
         </activity>
+
+        <!-- Add Google Sign-In Activity with tools:replace -->
+        <activity
+            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+            android:exported="true"
+            tools:replace="android:exported" />
     </application>
 </manifest>

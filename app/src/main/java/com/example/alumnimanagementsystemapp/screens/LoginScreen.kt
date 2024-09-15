@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
 import kotlinx.coroutines.delay
@@ -33,11 +34,12 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     val authState = authViewModel.authState.observeAsState()
 
     LaunchedEffect(authState.value) {
-        // Navigate to HomePage after showing the LoginScreen for a short period
-        delay(3000L) // Adjust delay time if needed
-        navController.navigate("home") {
-            // Clear the back stack so the user cannot navigate back to the LoginScreen
-            popUpTo("loginScreen") { inclusive = true }
+        if (authState.value is AuthState.Authenticated) {
+            // Delay for 3 seconds before navigating to HomePage
+            delay(3000)
+            navController.navigate("home") {
+                popUpTo("loginScreen") { inclusive = true }
+            }
         }
     }
 

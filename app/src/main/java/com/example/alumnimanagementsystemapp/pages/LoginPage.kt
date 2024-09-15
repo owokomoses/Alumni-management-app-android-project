@@ -76,11 +76,16 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
 
     var user by remember { mutableStateOf(Firebase.auth.currentUser) }
 
-    val launcher = rememberFirebaseAuthLauncher(onAuthComplete = {result ->
-        user = result.user
-    }, onAuthError = {
-        user = null
-    })
+    val launcher = rememberFirebaseAuthLauncher(
+        onAuthComplete = { result ->
+            user = result.user
+            Log.d("LoginPage", "Google Sign-In Successful, user: $user")
+        },
+        onAuthError = { exception ->
+            user = null
+            Log.d("LoginPage", "Google Sign-In Failed: ${exception.message}")
+        }
+    )
 
 
 
@@ -108,8 +113,8 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
 
 
     LaunchedEffect(authState.value, user) {
-        when(authState.value){
-            is AuthState.Authenticated -> navController.navigate("loginScreen"){
+        when (authState.value) {
+            is AuthState.Authenticated -> navController.navigate("loginScreen") {
                 popUpTo("login") { inclusive = true }
             }
             is AuthState.Error -> Toast.makeText(context,
@@ -117,6 +122,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             else -> Unit
         }
     }
+
 
     Column(
         modifier = modifier
@@ -141,7 +147,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             value = email,
             onValueChange = {
                 email = it
-        },
+            },
             label ={
                 Text(
                     text = "Email",
@@ -160,7 +166,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     emailIsFocused = focusState.isFocused
                 },
             textStyle = TextStyle(color = Color.Gray)
-            )
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -208,7 +214,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             enabled = authState.value != AuthState.Loading,
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
 
-            ) {
+        ) {
             Text(text = "Login", color = Color.Black)
         }
 
@@ -219,8 +225,6 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     .requestIdToken(token)
                     .requestEmail()
                     .build()
-
-
 
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 launcher.launch(googleSignInClient.signInIntent)
@@ -248,26 +252,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     fontSize = 15.sp,
                     letterSpacing = 0.1.em)
             }
-        }else{
-            Text("Hi, ${user!!.displayName}!",
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp, color = Color.White
-            )
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(onClick = {
-                Firebase.auth.signOut()
-                user = null
-            },
-                ) {
-                Text("Log out",
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 15.sp,
-                    letterSpacing = 0.1.em)
-            }
         }
 
 
@@ -278,7 +263,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             navController.navigate("signup")
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
+        ) {
             Text(text = "Don't have an account? Signup", color = Color.Red)
         }
     }

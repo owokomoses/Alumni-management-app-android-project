@@ -20,6 +20,8 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun HomePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
@@ -54,12 +56,17 @@ fun HomePage(modifier: Modifier = Modifier, navController: NavController, authVi
         ) {
             Text(text = "Home Page", fontSize = 32.sp, color = Color.Black)
 
+            // Log out button that logs the user out from Firebase and navigates to login
             TextButton(onClick = {
-                authViewModel.signout()
+                authViewModel.signout() // Call to sign out from Firebase
+                Firebase.auth.signOut() // Logs the user out from Firebase
+                navController.navigate("login") { // Navigate back to login screen
+                    popUpTo("home") { inclusive = true } // Clear home from the stack
+                }
             }) {
-                Text(text = "Sign out", color = Color.Black)
+                Text(text = "Log out", color = Color.Black)
             }
-        }
 
+        }
     }
 }
