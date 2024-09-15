@@ -32,12 +32,19 @@ class AuthViewModel : ViewModel() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
+                    val user = auth.currentUser
+                    if (user != null && user.isEmailVerified) {
+                        _authState.value = AuthState.Authenticated
+                    } else {
+                        // Email not verified
+                        _authState.value = AuthState.Error("Email not verified. Please check your inbox.")
+                    }
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message ?: "Something went wrong")
                 }
             }
     }
+
 
     fun signup(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {

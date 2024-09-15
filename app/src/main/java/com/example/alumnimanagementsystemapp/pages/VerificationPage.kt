@@ -42,7 +42,7 @@ fun VerificationPage(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.VerificationEmailSent -> {
-                Toast.makeText(context, "Verification email sent. Please check your inbox.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Verification email sent. Please check your email.", Toast.LENGTH_SHORT).show()
                 // Optionally, navigate to another page or handle the state
                 // For example, you might navigate to a login page:
                 navController.navigate("login") {
