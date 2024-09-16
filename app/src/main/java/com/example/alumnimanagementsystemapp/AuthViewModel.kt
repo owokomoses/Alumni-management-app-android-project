@@ -46,7 +46,7 @@ class AuthViewModel : ViewModel() {
                     } else {
                         // Email not verified
                         _authState.value =
-                            AuthState.Error("Email not verified. Please check your inbox.")
+                            AuthState.Error("Email not verified. Please verify to activate account.")
                     }
                 } else {
                     _authState.value =

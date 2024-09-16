@@ -119,14 +119,25 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
 
     LaunchedEffect(authState.value, user) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate("loginScreen") {
-                popUpTo("login") { inclusive = true }
+            is AuthState.Authenticated -> {
+                val currentUser = Firebase.auth.currentUser
+                if (currentUser?.isEmailVerified == true) {
+                    navController.navigate("loginScreen") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                } else {
+                    navController.navigate("verificationPage") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
             }
-            is AuthState.Error -> Toast.makeText(context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Error -> {
+                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            }
             else -> Unit
         }
     }
+
 
 
     Column(

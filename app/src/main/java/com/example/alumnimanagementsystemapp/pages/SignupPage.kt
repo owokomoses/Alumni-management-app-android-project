@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun SignupPage(
@@ -53,6 +54,8 @@ fun SignupPage(
 
     var displayName by remember { mutableStateOf("") }
 
+    var isProcessing by remember { mutableStateOf(false) }
+
     val focusRequester = remember { FocusRequester() }
 
     val authState = authViewModel.authState.observeAsState()
@@ -60,15 +63,18 @@ fun SignupPage(
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate("verificationPage"){
-                // Remove SignupPage from the back stack
-                popUpTo("signup") { inclusive = true }
+            is AuthState.Authenticated -> {
+                if (isProcessing) {
+                    delay(3000) // Wait for 3 seconds
+                    navController.navigate("verificationPage") {
+                        popUpTo("signup") { inclusive = true }
+                    }
+                }
             }
-            is AuthState.Error -> Toast.makeText(
-                context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
-            ).show()
-
+            is AuthState.Error -> {
+                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                isProcessing = false // Stop processing if there's an error
+            }
             else -> Unit
         }
     }
