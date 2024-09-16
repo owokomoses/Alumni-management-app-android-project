@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +88,7 @@ fun ForgotPasswordPage(
                     color = if (emailIsFocused) Color.Red else Color.Gray
                 )
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email,imeAction = ImeAction.Done ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,

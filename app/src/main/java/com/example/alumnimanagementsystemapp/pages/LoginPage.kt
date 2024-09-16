@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -157,7 +158,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 )
 
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email,imeAction = ImeAction.Done ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
@@ -196,6 +197,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     )
                 }
             },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password,imeAction = ImeAction.Done ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
