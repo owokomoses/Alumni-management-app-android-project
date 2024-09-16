@@ -11,8 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -169,7 +171,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray)
+            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -208,25 +210,25 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray)
+            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        TextButton(onClick = {
-            navController.navigate("forgotPasswordPage")
-        }) {
-            Text(text = "Forgot Password?", color = Color.Red)
-        }
 
-
-
-        TextButton(onClick = {
-            navController.navigate("signup")
-        },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
-            Text(text = "Don't have an account? Signup", color = Color.Red)
+            TextButton(
+                onClick = {
+                    navController.navigate("forgotPasswordPage")
+                },
+                modifier = Modifier.align(Alignment.CenterVertically)
+                    .padding(end = 16.dp)
+            ) {
+                Text(text = "Forgot Password?", color = Color.Red)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -241,6 +243,16 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             Text(text = "Login", color = Color.Black)
         }
 
+        TextButton(onClick = {
+            navController.navigate("signup")
+        },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        ) {
+            Text(text = "Don't have an account? Signup", color = Color.Red)
+        }
+
+
+
         if (user == null){
             Spacer(modifier = Modifier.height(35.dp))
             ElevatedButton(onClick = {
@@ -253,10 +265,6 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                 launcher.launch(googleSignInClient.signInIntent)
             },
                 shape = RoundedCornerShape(15.dp),
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxSize()
-                    .padding(5.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color.Black
@@ -264,7 +272,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             ) {
                 Image(painter = painterResource(id = R.drawable.google_logo),
                     contentDescription ="",
-                    modifier = Modifier.size(45.dp),
+                    modifier = Modifier.size(20.dp),
                     contentScale = ContentScale.Fit )
 
                 Spacer(modifier = Modifier.width(10.dp))

@@ -108,7 +108,7 @@ fun SignupPage(
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray)
+            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -145,7 +145,7 @@ fun SignupPage(
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray)
+            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -182,7 +182,7 @@ fun SignupPage(
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray)
+            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
