@@ -51,6 +51,8 @@ fun SignupPage(
 
     var emailIsFocused by remember { mutableStateOf(false) }
 
+    var displayName by remember { mutableStateOf("") }
+
     val focusRequester = remember { FocusRequester() }
 
     val authState = authViewModel.authState.observeAsState()
@@ -85,6 +87,21 @@ fun SignupPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Signup", fontSize = 32.sp, color = Color.Red)
+
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = displayName,
+            onValueChange = { displayName = it },
+            label = { Text(text = "Name", color = if (emailIsFocused) Color.Red else Color.Gray) },
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Gray,
+                cursorColor = Color.Red
+            ),
+            modifier = Modifier.focusRequester(focusRequester),
+            textStyle = TextStyle(color = Color.Gray, fontSize = 18.sp)
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
