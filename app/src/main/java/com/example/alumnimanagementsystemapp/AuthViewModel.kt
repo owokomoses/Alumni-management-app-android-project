@@ -89,7 +89,7 @@ class AuthViewModel : ViewModel() {
                 val auth = Firebase.auth
                 auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        _authState.postValue(AuthState.Authenticated) // or another state indicating success
+                        _authState.postValue(AuthState.ResetPasswordSent)
                     } else {
                         _authState.postValue(AuthState.Error(task.exception?.message ?: "An error occurred"))
                     }
@@ -99,6 +99,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
 
     fun signout() {
         auth.signOut()
@@ -111,5 +112,6 @@ sealed class AuthState {
     object Unauthenticated : AuthState()
     object Loading : AuthState()
     object VerificationEmailSent : AuthState()
+    object ResetPasswordSent : AuthState()
     data class Error(val message: String) : AuthState()
 }

@@ -5,9 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,8 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -38,16 +33,6 @@ fun ForgotPasswordPage(
 ) {
     var email by remember { mutableStateOf("") }
 
-    var password by remember { mutableStateOf("") }
-
-    var confirmPassword by remember { mutableStateOf("") }
-
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
-
-    var passwordVisible by remember {
-        mutableStateOf(false)
-    }
-
     var emailIsFocused by remember { mutableStateOf(false) }
 
     val focusRequester = remember { FocusRequester() }
@@ -55,15 +40,23 @@ fun ForgotPasswordPage(
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+    // Handle navigation based on the AuthState changes
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navController.navigate("login") {
-                popUpTo("forgot_password") { inclusive = true }
+            is AuthState.ResetPasswordSent -> {
+                Toast.makeText(context, "Reset password link sent. Check your email.", Toast.LENGTH_SHORT).show()
+                // Navigate back to the login screen
+                navController.navigate("login") {
+                    popUpTo("forgot_password") { inclusive = true }
+                }
             }
-            is AuthState.Error -> Toast.makeText(
-                context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
-            ).show()
+            is AuthState.Error -> {
+                Toast.makeText(
+                    context,
+                    (authState.value as AuthState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
             else -> Unit
         }
     }
@@ -108,91 +101,13 @@ fun ForgotPasswordPage(
             textStyle = TextStyle(color = Color.Gray)
         )
 
-
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = {
-                Text(
-                    text = "Password",
-                    color = if (emailIsFocused) Color.Red else Color.Gray
-                )
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = {
-                    passwordVisible = !passwordVisible
-                }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                        tint = Color.Red
-                    )
-                }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Red
-            ),
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged { focusState ->
-                    emailIsFocused = focusState.isFocused
-                },
-            textStyle = TextStyle(color = Color.Gray)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = {
-                Text(
-                    text = "Confirm Password",
-                    color = if (emailIsFocused) Color.Red else Color.Gray
-                )
-            },
-            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = {
-                    confirmPasswordVisible = !confirmPasswordVisible
-                }) {
-                    Icon(
-                        imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                        tint = Color.Red
-                    )
-                }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Red,
-                unfocusedBorderColor = Color.Gray,
-                cursorColor = Color.Red
-            ),
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .onFocusChanged { focusState ->
-                    emailIsFocused = focusState.isFocused
-                },
-            textStyle = TextStyle(color = Color.Gray)
-        )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            if (password == confirmPassword) {
-                if (email.isNotEmpty()) {
-                    authViewModel.resetPassword(email, password)
-                } else {
-                    Toast.makeText(context, "Email cannot be empty", Toast.LENGTH_SHORT).show()
-                }
+            if (email.isNotEmpty()) {
+                authViewModel.resetPassword(email)
             } else {
-                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Email cannot be empty", Toast.LENGTH_SHORT).show()
             }
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
