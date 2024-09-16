@@ -206,7 +206,7 @@ fun SignupPage(
 
         Button(onClick = {
             if (password == confirmPassword) {
-            authViewModel.signup(email,password)
+            authViewModel.signup(email,password,displayName)
             } else {
                 Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }

@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -21,12 +22,14 @@ class AuthViewModel : ViewModel() {
     }
 
     private fun checkAuthStatus() {
-        if (auth.currentUser == null) {
+        val currentUser = auth.currentUser
+        if (currentUser == null || !currentUser.isEmailVerified) {
             _authState.value = AuthState.Unauthenticated
         } else {
             _authState.value = AuthState.Authenticated
         }
     }
+
 
     fun login(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
@@ -42,16 +45,18 @@ class AuthViewModel : ViewModel() {
                         _authState.value = AuthState.Authenticated
                     } else {
                         // Email not verified
-                        _authState.value = AuthState.Error("Email not verified. Please check your inbox.")
+                        _authState.value =
+                            AuthState.Error("Email not verified. Please check your inbox.")
                     }
                 } else {
-                    _authState.value = AuthState.Error(task.exception?.message ?: "Something went wrong")
+                    _authState.value =
+                        AuthState.Error(task.exception?.message ?: "Something went wrong")
                 }
             }
     }
 
 
-    fun signup(email: String, password: String) {
+    fun signup(email: String, password: String, displayName: String) {
         if (email.isEmpty() || password.isEmpty()) {
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
@@ -60,12 +65,27 @@ class AuthViewModel : ViewModel() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    _authState.value = AuthState.Authenticated
+                    val user = auth.currentUser
+                    // Set the display name for the user
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(displayName)
+                        .build()
+
+                    user?.updateProfile(profileUpdates)
+                        ?.addOnCompleteListener { profileUpdateTask ->
+                            if (profileUpdateTask.isSuccessful) {
+                                _authState.value = AuthState.Authenticated
+                            } else {
+                                _authState.value = AuthState.Error("Failed to update display name")
+                            }
+                        }
                 } else {
-                    _authState.value = AuthState.Error(task.exception?.message ?: "Something went wrong")
+                    _authState.value =
+                        AuthState.Error(task.exception?.message ?: "Something went wrong")
                 }
             }
     }
+
 
     fun sendVerificationEmail() {
         val user = auth.currentUser
@@ -91,7 +111,11 @@ class AuthViewModel : ViewModel() {
                     if (task.isSuccessful) {
                         _authState.postValue(AuthState.ResetPasswordSent)
                     } else {
-                        _authState.postValue(AuthState.Error(task.exception?.message ?: "An error occurred"))
+                        _authState.postValue(
+                            AuthState.Error(
+                                task.exception?.message ?: "An error occurred"
+                            )
+                        )
                     }
                 }
             } catch (e: Exception) {
