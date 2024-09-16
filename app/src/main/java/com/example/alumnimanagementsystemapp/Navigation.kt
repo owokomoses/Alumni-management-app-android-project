@@ -65,6 +65,10 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             }
         }
 
+        composable("signupScreen") {
+            SignupScreen(navController = navController, authViewModel = authViewModel)
+        }
+
         composable("signup") {
             SignupPage(modifier, navController, authViewModel)
         }

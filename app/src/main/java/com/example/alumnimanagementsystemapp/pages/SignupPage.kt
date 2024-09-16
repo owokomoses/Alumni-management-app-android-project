@@ -39,25 +39,14 @@ fun SignupPage(
     authViewModel: AuthViewModel
 ) {
     var email by remember { mutableStateOf("") }
-
     var password by remember { mutableStateOf("") }
-
     var confirmPassword by remember { mutableStateOf("") }
-
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-
-    var passwordVisible by remember {
-        mutableStateOf(false)
-    }
-
+    var passwordVisible by remember { mutableStateOf(false) }
     var emailIsFocused by remember { mutableStateOf(false) }
-
     var displayName by remember { mutableStateOf("") }
-
     var isProcessing by remember { mutableStateOf(false) }
-
     val focusRequester = remember { FocusRequester() }
-
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
@@ -66,7 +55,7 @@ fun SignupPage(
             is AuthState.Authenticated -> {
                 if (isProcessing) {
                     delay(3000) // Wait for 3 seconds
-                    navController.navigate("verificationPage") {
+                    navController.navigate("signupScreen") {
                         popUpTo("signup") { inclusive = true }
                     }
                 }
@@ -80,7 +69,9 @@ fun SignupPage(
     }
 
     Column(
-        modifier = modifier.fillMaxSize().background(Color.White),
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -120,18 +111,18 @@ fun SignupPage(
                     color = if (emailIsFocused) Color.Red else Color.Gray
                 )
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email,imeAction = ImeAction.Done ),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
                 cursorColor = Color.Red
-                ),
+            ),
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
+            textStyle = TextStyle(color = Color.Gray, fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -157,18 +148,18 @@ fun SignupPage(
                     )
                 }
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password,imeAction = ImeAction.Done ),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
                 cursorColor = Color.Red
-                ),
+            ),
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
+            textStyle = TextStyle(color = Color.Gray, fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -194,7 +185,7 @@ fun SignupPage(
                     )
                 }
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password,imeAction = ImeAction.Done ),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Gray,
@@ -205,20 +196,21 @@ fun SignupPage(
                 .onFocusChanged { focusState ->
                     emailIsFocused = focusState.isFocused
                 },
-            textStyle = TextStyle(color = Color.Gray,fontSize = 18.sp)
+            textStyle = TextStyle(color = Color.Gray, fontSize = 18.sp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
             if (password == confirmPassword) {
-            authViewModel.signup(email,password,displayName)
+                isProcessing = true
+                authViewModel.signup(email, password, displayName)
             } else {
                 Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
+        ) {
             Text(text = "Create account", color = Color.Black)
         }
 
@@ -228,7 +220,7 @@ fun SignupPage(
             navController.navigate("login")
         },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-            ) {
+        ) {
             Text(text = "Already have an account? Login", color = Color.Red)
         }
     }
