@@ -23,12 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-
-
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.alumnimanagementsystemapp.AuthViewModel
 
 
 @Composable
-fun MainScreen (){
+fun MainScreen (navController: NavHostController = rememberNavController(), authViewModel: AuthViewModel){
 
     var currentRoute by remember {
         mutableStateOf("home")
@@ -62,6 +63,7 @@ fun MainScreen (){
         bottomBar = {
             BottomNavigationBar(items= items,currentScreen = currentRoute ) {
                 currentRoute = it
+                navController.navigate(it)
             }
         }
     ){ paddingValues ->
@@ -118,5 +120,5 @@ fun ScreenOne(paddingValues: PaddingValues,
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview(){
-    MainScreen()
+    MainScreen(authViewModel = AuthViewModel())
 }
