@@ -1,6 +1,9 @@
 package com.example.alumnimanagementsystemapp.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -10,11 +13,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -48,19 +54,24 @@ fun MainScreen (){
             "Profile",
             "profile",
             Icons.Filled.AccountCircle
-        )
+        ),
 
     )
 
     Scaffold (
         bottomBar = {
-            BottomNavigationBar(items= ,currentScreen = currentRoute ) {
-
+            BottomNavigationBar(items= items,currentScreen = currentRoute ) {
+                currentRoute = it
             }
         }
     ){ paddingValues ->
-        ScreenOne(paddingValues)
 
+        when (currentRoute){
+            "home" -> ScreenOne(paddingValues, Color.Red)
+            "task" -> ScreenOne(paddingValues, Color.Green)
+            "notification" -> ScreenOne(paddingValues, Color.Blue)
+            "profile" -> ScreenOne(paddingValues, Color.Yellow)
+        }
     }
 
 }
@@ -77,6 +88,8 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = currentScreen == item.route,
                 onClick = { onItemClick(item.route) },
+                label = {Text(text = item.title)},
+                alwaysShowLabel = currentScreen == item.route,
                 icon = { Icon(imageVector = item.icon, contentDescription = "") })
         }
     }
@@ -89,8 +102,16 @@ data class BottomNavigationItem(
 )
 
 @Composable
-fun ScreenOne(paddingValues: PaddingValues){
+fun ScreenOne(paddingValues: PaddingValues,
+              color: Color
+              ){
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = color)
+    ){
 
+    }
 }
 
 
