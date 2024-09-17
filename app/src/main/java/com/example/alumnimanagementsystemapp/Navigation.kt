@@ -73,8 +73,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             SignupPage(modifier, navController, authViewModel)
         }
 
-
-
         composable("home") {
             HomePage(modifier, navController, authViewModel)
         }
