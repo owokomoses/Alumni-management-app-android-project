@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -26,10 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
+import com.example.alumnimanagementsystemapp.pages.HomePage
 
 
 @Composable
-fun MainScreen (navController: NavHostController = rememberNavController(), authViewModel: AuthViewModel){
+fun MainScreen (navController: NavHostController,authViewModel: AuthViewModel){
 
     var currentRoute by remember {
         mutableStateOf("home")
@@ -57,19 +59,25 @@ fun MainScreen (navController: NavHostController = rememberNavController(), auth
             Icons.Filled.AccountCircle
         ),
 
-    )
+        )
 
     Scaffold (
         bottomBar = {
-            BottomNavigationBar(items= items,currentScreen = currentRoute ) {
-                currentRoute = it
-                navController.navigate(it)
+            BottomNavigationBar(items= items,currentScreen = currentRoute,
+             onItemClick = { route ->
+                if (currentRoute != route) {
+                    currentRoute = route
+                    navController.navigate(route) {
+                        // Pop up to avoid multiple instances of the same route
+                        popUpTo(route) { inclusive = true }
+                    }
+                }
             }
+            )
         }
     ){ paddingValues ->
-
         when (currentRoute){
-            "home" -> ScreenOne(paddingValues, Color.Red)
+            "home" -> HomePage(modifier = Modifier.padding(paddingValues), navController = navController, authViewModel = AuthViewModel())
             "task" -> ScreenOne(paddingValues, Color.Green)
             "notification" -> ScreenOne(paddingValues, Color.Blue)
             "profile" -> ScreenOne(paddingValues, Color.Yellow)
@@ -80,7 +88,7 @@ fun MainScreen (navController: NavHostController = rememberNavController(), auth
 
 @Composable
 fun BottomNavigationBar(
-    items : List<BottomNavigationItem> = listOf(),
+    items : List<BottomNavigationItem>,
     currentScreen : String,
     onItemClick : (String) -> Unit
 
@@ -92,7 +100,7 @@ fun BottomNavigationBar(
                 onClick = { onItemClick(item.route) },
                 label = {Text(text = item.title)},
                 alwaysShowLabel = currentScreen == item.route,
-                icon = { Icon(imageVector = item.icon, contentDescription = "") })
+                icon = { Icon(imageVector = item.icon, contentDescription = item.title) })
         }
     }
 }
@@ -104,21 +112,20 @@ data class BottomNavigationItem(
 )
 
 @Composable
-fun ScreenOne(paddingValues: PaddingValues,
-              color: Color
-              ){
+fun ScreenOne(paddingValues: PaddingValues, color: Color){
     Column (
         modifier = Modifier
             .fillMaxSize()
             .background(color = color)
+            .padding(paddingValues)
     ){
 
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview(){
-    MainScreen(authViewModel = AuthViewModel())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MainScreenPreview(){
+//    MainScreen(authViewModel = AuthViewModel())
+//}

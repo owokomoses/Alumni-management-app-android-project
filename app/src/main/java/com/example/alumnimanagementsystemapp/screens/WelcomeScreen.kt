@@ -16,10 +16,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun WelcomeScreen(navController: NavController) {
     // Delay for 3 seconds
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         delay(3000L) // Wait for 3 seconds
-        navController.navigate("login") // Navigate to the login screen
-
+        // Check authentication state and navigate accordingly
         navController.navigate("login") {
             popUpTo("welcome") { inclusive = true }
         }
@@ -35,7 +34,6 @@ fun WelcomeScreen(navController: NavController) {
             contentDescription = "Welcome Image",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
-
         )
     }
 }

@@ -87,7 +87,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
         }
 
         composable("mainScreen") {
-            MainScreen()
+            MainScreen(navController = navController, authViewModel = authViewModel)
         }
     }
 }
