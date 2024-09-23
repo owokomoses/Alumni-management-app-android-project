@@ -10,7 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
 import com.example.alumnimanagementsystemapp.pages.HomePage
 import com.example.alumnimanagementsystemapp.pages.LoginPage
+import com.example.alumnimanagementsystemapp.pages.NotificationPage
+import com.example.alumnimanagementsystemapp.pages.ProfilePage
 import com.example.alumnimanagementsystemapp.pages.SignupPage
+import com.example.alumnimanagementsystemapp.pages.TaskPage
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
 import com.example.alumnimanagementsystemapp.screens.MainScreen
@@ -76,6 +79,18 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("home") {
             HomePage(modifier, navController, authViewModel)
+        }
+
+        composable("task") {
+            TaskPage(modifier, navController, authViewModel)
+        }
+
+        composable("notification") {
+            NotificationPage(modifier, navController, authViewModel)
+        }
+
+        composable("profile") {
+            ProfilePage(modifier, navController, authViewModel)
         }
 
         composable("verificationPage") {

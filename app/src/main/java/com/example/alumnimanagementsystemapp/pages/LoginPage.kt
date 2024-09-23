@@ -125,11 +125,8 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
                     navController.navigate("loginScreen") {
                         popUpTo("login") { inclusive = true }
                     }
-                } else {
-                    navController.navigate("verificationPage") {
-                        popUpTo("login") { inclusive = true }
-                    }
                 }
+
             }
             is AuthState.Error -> {
                 Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()

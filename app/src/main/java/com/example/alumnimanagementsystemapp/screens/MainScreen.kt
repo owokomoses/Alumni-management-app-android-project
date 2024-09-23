@@ -25,18 +25,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.pages.HomePage
+import com.example.alumnimanagementsystemapp.pages.NotificationPage
+import com.example.alumnimanagementsystemapp.pages.ProfilePage
+import com.example.alumnimanagementsystemapp.pages.TaskPage
 
 
 @Composable
-fun MainScreen (navController: NavHostController,authViewModel: AuthViewModel){
+fun MainScreen(navController: NavHostController, authViewModel: AuthViewModel) {
+    val navController = rememberNavController()
 
+    // Single route to manage navigation
     var currentRoute by remember {
         mutableStateOf("home")
     }
 
+    // Define the bottom navigation items
     val items = listOf(
         BottomNavigationItem(
             "Home",
@@ -58,57 +66,81 @@ fun MainScreen (navController: NavHostController,authViewModel: AuthViewModel){
             "profile",
             Icons.Filled.AccountCircle
         ),
+    )
 
-        )
-
-    Scaffold (
+    Scaffold(
         bottomBar = {
-            BottomNavigationBar(items= items,currentScreen = currentRoute,
-             onItemClick = { route ->
-                if (currentRoute != route) {
-                    currentRoute = route
-                    navController.navigate(route) {
-                        // Pop up to avoid multiple instances of the same route
-                        popUpTo(route) { inclusive = true }
+            BottomNavigationBar(items = items, currentScreen = currentRoute,
+                onItemClick = { route ->
+                    if (currentRoute != route) {
+                        currentRoute = route
+                        navController.navigate(route) {
+                            popUpTo(0) { inclusive = false }  // Use popUpTo(0) instead
+                            launchSingleTop = true
+                        }
                     }
                 }
-            }
             )
         }
-    ){ paddingValues ->
-        when (currentRoute){
-            "home" -> HomePage(modifier = Modifier.padding(paddingValues), navController = navController, authViewModel = AuthViewModel())
-            "task" -> ScreenOne(paddingValues, Color.Green)
-            "notification" -> ScreenOne(paddingValues, Color.Blue)
-            "profile" -> ScreenOne(paddingValues, Color.Yellow)
+    ) { paddingValues ->
+
+        // Use NavHost to manage screen transitions inside Scaffold
+        NavHost(
+            navController = navController,
+            startDestination = "home",  // Initial screen
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            composable("home") {
+                HomePage(
+                    navController = navController,
+                    authViewModel = authViewModel
+                )
+            }
+            composable("task") {
+                TaskPage(
+                    navController = navController,
+                    authViewModel = authViewModel
+                )
+            }
+            composable("notification") {
+                NotificationPage(
+                    navController = navController,
+                    authViewModel = authViewModel
+                )
+            }
+            composable("profile") {
+                ProfilePage(
+                    navController = navController,
+                    authViewModel = authViewModel
+                )
+            }
         }
     }
-
 }
 
 @Composable
 fun BottomNavigationBar(
-    items : List<BottomNavigationItem>,
-    currentScreen : String,
-    onItemClick : (String) -> Unit
-
-){
+    items: List<BottomNavigationItem>,
+    currentScreen: String,
+    onItemClick: (String) -> Unit
+) {
     NavigationBar {
-        items.forEach{ item ->
+        items.forEach { item ->
             NavigationBarItem(
                 selected = currentScreen == item.route,
                 onClick = { onItemClick(item.route) },
-                label = {Text(text = item.title)},
+                label = { Text(text = item.title) },
                 alwaysShowLabel = currentScreen == item.route,
-                icon = { Icon(imageVector = item.icon, contentDescription = item.title) })
+                icon = { Icon(imageVector = item.icon, contentDescription = item.title) }
+            )
         }
     }
 }
 
 data class BottomNavigationItem(
-    val title : String,
-    val route : String,
-    val icon : ImageVector
+    val title: String,
+    val route: String,
+    val icon: ImageVector
 )
 
 @Composable
