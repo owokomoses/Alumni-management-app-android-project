@@ -22,13 +22,16 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -161,12 +164,13 @@ fun TopBar(
         navigationIcon = {
             Icon(
                 imageVector = Icons.Rounded.Menu,
-                contentDescription = null,
-                modifier = Modifier.clickable {
-                    onOpenDrawer()
-                }
+                contentDescription = "Menu",
+                modifier = Modifier
+                    .clickable {
+                        onOpenDrawer()
+                    }
                     .padding(start = 16.dp, end = 8.dp)
-                    .size(27.dp)
+                    .size(28.dp)
             )
         },
         actions = {
@@ -174,7 +178,6 @@ fun TopBar(
                 imageVector = Icons.Rounded.Notifications,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(end = 8.dp)
                     .size(30.dp)
             )
 
@@ -182,7 +185,7 @@ fun TopBar(
                 imageVector = Icons.Rounded.AccountCircle,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(start = 4.dp, end = 16.dp)
+                    .padding(start = 8.dp, end = 16.dp)
                     .size(30.dp)
             )
         }
@@ -191,5 +194,72 @@ fun TopBar(
 
 @Composable
 fun DrawerContent(modifier: Modifier = Modifier){
+    Text(
+        text = "App Name",
+        fontSize = 24.sp,
+        modifier = Modifier.padding(16.dp)
+    )
+
+    HorizontalDivider()
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    NavigationDrawerItem(
+           icon = {
+               Icon(
+                   imageVector = Icons.Rounded.AccountCircle,
+                   contentDescription = "Account"
+               )
+           },
+           label = {
+               Text(
+                   text = "Account",
+                   fontSize = 17.sp,
+                   modifier = Modifier.padding(16.dp)
+               )
+           },
+           selected = false,
+           onClick = { /*TODO*/ }
+    )
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    NavigationDrawerItem(
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Notifications,
+                contentDescription = "Notifications"
+            )
+        },
+        label = {
+            Text(
+                text = "Notifications",
+                fontSize = 17.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        selected = false,
+        onClick = { /*TODO*/ }
+    )
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    NavigationDrawerItem(
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Email,
+                contentDescription = "Email"
+            )
+        },
+        label = {
+            Text(
+                text = "Email",
+                fontSize = 17.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        selected = false,
+        onClick = { /*TODO*/ }
+    )
 
 }
