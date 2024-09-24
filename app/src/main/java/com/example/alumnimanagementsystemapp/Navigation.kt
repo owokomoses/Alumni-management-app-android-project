@@ -16,7 +16,7 @@ import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.pages.TaskPage
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
-import com.example.alumnimanagementsystemapp.screens.MainScreen
+
 import com.example.alumnimanagementsystemapp.screens.SignupScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
 import kotlinx.coroutines.delay
@@ -34,7 +34,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 delay(3000)
                 when (authState.value) {
                     is AuthState.Authenticated -> {
-                        navController.navigate("mainScreen") {
+                        navController.navigate("home") {
                             popUpTo("welcome") { inclusive = true }
                         }
                     }
@@ -62,7 +62,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 if (authState.value is AuthState.Authenticated) {
                     // Delay for 3 seconds before navigating to HomePage
                     delay(3000)
-                    navController.navigate("mainScreen") {
+                    navController.navigate("home") {
                         popUpTo("loginScreen") { inclusive = true }
                     }
                 }
@@ -101,8 +101,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             ForgotPasswordPage(modifier, navController, authViewModel)
         }
 
-        composable("mainScreen") {
-            MainScreen(navController = navController, authViewModel = authViewModel)
-        }
+
     }
 }

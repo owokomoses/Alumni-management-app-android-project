@@ -37,7 +37,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         if (authState.value is AuthState.Authenticated) {
             // Delay for 3 seconds before navigating to HomePage
             delay(3000)
-            navController.navigate("mainScreen") {
+            navController.navigate("home") {
                 popUpTo("loginScreen") { inclusive = true }
             }
         }

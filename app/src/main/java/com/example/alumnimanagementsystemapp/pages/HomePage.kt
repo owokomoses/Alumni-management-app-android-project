@@ -67,5 +67,3 @@ fun HomePage(modifier: Modifier = Modifier, navController: NavController, authVi
         }
     }
 }
-
-
