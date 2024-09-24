@@ -7,6 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,6 +21,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -67,7 +71,15 @@ fun TopBar(
         ),
         title = {
             Text(text = "Search for Jobs",
-                color = MaterialTheme.colorScheme.onBackground.copy(0.7f))
+                color = MaterialTheme.colorScheme.onBackground.copy(0.7f),
+                fontSize = 17.sp
+            )
+        },
+        navigationIcon = {
+            Icon(
+                imageVector = Icons.Rounded.Menu,
+                contentDescription = null
+            )
         }
     )
 
