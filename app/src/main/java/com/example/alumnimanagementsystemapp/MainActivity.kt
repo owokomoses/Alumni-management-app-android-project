@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        TopBar(scrollBehavior = scrollBehavior)
+                        TopBar(
+                            scrollBehavior = scrollBehavior)
                     }
                 ) { paddingValues ->
                     Screen(
@@ -61,6 +62,9 @@ fun TopBar(
     TopAppBar(
         modifier = modifier,
         scrollBehavior = scrollBehavior,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.6f)
+        ),
         title = {
             Text(text = "Search for Jobs",
                 color = MaterialTheme.colorScheme.onBackground.copy(0.7f))
