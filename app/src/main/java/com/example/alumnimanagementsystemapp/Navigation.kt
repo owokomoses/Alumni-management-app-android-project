@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
-import com.example.alumnimanagementsystemapp.pages.HomePage
 import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.NotificationPage
 import com.example.alumnimanagementsystemapp.pages.ProfilePage
@@ -85,9 +84,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             SignupPage(modifier, navController, authViewModel)
         }
 
-        composable("home") {
-            HomePage(modifier, navController, authViewModel)
-        }
 
         composable("users") {
             Users(modifier, navController, authViewModel)

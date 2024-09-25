@@ -128,7 +128,8 @@ fun Screen(
                                 }
                             }
                         },
-                        scrollBehavior = scrollBehavior
+                        scrollBehavior = scrollBehavior,
+                        navController =navController
                     )
                 }
             }
@@ -170,6 +171,7 @@ fun ScreenContent(paddingValues: PaddingValues){
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
+    navController: NavController,
     onOpenDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ){
@@ -212,6 +214,13 @@ fun TopBar(
                 imageVector = Icons.Rounded.AccountCircle,
                 contentDescription = null,
                 modifier = Modifier
+                    .clickable {
+                        navController.navigate("profile") {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                     .padding(start = 8.dp, end = 16.dp)
                     .size(30.dp)
             )
