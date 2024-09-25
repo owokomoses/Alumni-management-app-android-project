@@ -25,6 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.rememberDrawerState
@@ -41,6 +43,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -87,6 +92,8 @@ fun Screen(modifier: Modifier = Modifier,navController: NavController, authViewM
 
     val scope = rememberCoroutineScope()
 
+    val authState = authViewModel.authState.observeAsState()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -94,7 +101,7 @@ fun Screen(modifier: Modifier = Modifier,navController: NavController, authViewM
                 modifier = Modifier.width(240.dp) // Set the desired width here
             ) {
                 ModalDrawerSheet {
-                    DrawerContent()
+                    DrawerContent(navController = navController, authViewModel = AuthViewModel())
                 }
             }
         }
@@ -206,9 +213,13 @@ fun TopBar(
 }
 
 @Composable
-fun DrawerContent(modifier: Modifier = Modifier){
+fun DrawerContent(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    authViewModel: AuthViewModel
+){
     Text(
-        text = "App Name",
+        text = "Alumni Management System",
         fontSize = 24.sp,
         modifier = Modifier.padding(16.dp)
     )
@@ -220,19 +231,26 @@ fun DrawerContent(modifier: Modifier = Modifier){
     NavigationDrawerItem(
         icon = {
             Icon(
-                imageVector = Icons.Rounded.AccountCircle,
-                contentDescription = "Account"
+                imageVector = Icons.Rounded.Home,
+                contentDescription = "Home"
             )
         },
         label = {
             Text(
-                text = "Account",
+                text = "Home",
                 fontSize = 17.sp,
                 modifier = Modifier.padding(16.dp)
             )
         },
         selected = false,
-        onClick = { /*TODO*/ }
+        onClick = {
+            // Navigate to the Home page when clicked
+            navController.navigate("home") {
+                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
     )
 
     Spacer(modifier = Modifier.height(4.dp))
@@ -273,6 +291,32 @@ fun DrawerContent(modifier: Modifier = Modifier){
         },
         selected = false,
         onClick = { /*TODO*/ }
+    )
+
+    Spacer(modifier = Modifier.height(350.dp))
+
+    NavigationDrawerItem(
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Logout,
+                contentDescription = "Logout"
+            )
+        },
+        label = {
+            Text(
+                text = "Logout",
+                fontSize = 17.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        selected = false,
+        onClick = {
+            authViewModel.signout() // Call to sign out from Firebase
+            Firebase.auth.signOut() // Logs the user out from Firebase
+            navController.navigate("login") { // Navigate back to login screen
+                popUpTo("main") { inclusive = true } // Clear main from the back stack
+            }
+        }
     )
 
 }
