@@ -13,7 +13,7 @@ import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.NotificationPage
 import com.example.alumnimanagementsystemapp.pages.ProfilePage
 import com.example.alumnimanagementsystemapp.pages.SignupPage
-import com.example.alumnimanagementsystemapp.pages.TaskPage
+import com.example.alumnimanagementsystemapp.pages.Users
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
 
@@ -74,8 +74,11 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
         }
 
         composable("main") {
-            Screen(navController = navController, authViewModel = authViewModel)
+            Screen(navController = navController, authViewModel = authViewModel) { paddingValues ->
+                ScreenContent(paddingValues = paddingValues)
+            }
         }
+
 
 
         composable("signup") {
@@ -86,8 +89,8 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             HomePage(modifier, navController, authViewModel)
         }
 
-        composable("task") {
-            TaskPage(modifier, navController, authViewModel)
+        composable("users") {
+            Users(modifier, navController, authViewModel)
         }
 
         composable("notification") {

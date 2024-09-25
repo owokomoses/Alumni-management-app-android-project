@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -80,7 +81,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen(modifier: Modifier = Modifier,navController: NavController, authViewModel: AuthViewModel){
+fun Screen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    content: @Composable (PaddingValues) -> Unit
+){
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState()
@@ -127,9 +133,10 @@ fun Screen(modifier: Modifier = Modifier,navController: NavController, authViewM
                 }
             }
         ) { paddingValues ->
-            ScreenContent(
-                paddingValues = paddingValues
-            )
+//            ScreenContent(
+//                paddingValues = paddingValues
+//            )
+            content(paddingValues)
         }
     }
 }
@@ -245,7 +252,7 @@ fun DrawerContent(
         selected = false,
         onClick = {
             // Navigate to the Home page when clicked
-            navController.navigate("home") {
+            navController.navigate("main") {
                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                 launchSingleTop = true
                 restoreState = true
@@ -258,19 +265,25 @@ fun DrawerContent(
     NavigationDrawerItem(
         icon = {
             Icon(
-                imageVector = Icons.Rounded.Notifications,
-                contentDescription = "Notifications"
+                imageVector = Icons.Rounded.Person,
+                contentDescription = "Users"
             )
         },
         label = {
             Text(
-                text = "Notifications",
+                text = "Users",
                 fontSize = 17.sp,
                 modifier = Modifier.padding(16.dp)
             )
         },
         selected = false,
-        onClick = { /*TODO*/ }
+        onClick = {
+            navController.navigate("users") {
+                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
     )
 
     Spacer(modifier = Modifier.height(4.dp))
