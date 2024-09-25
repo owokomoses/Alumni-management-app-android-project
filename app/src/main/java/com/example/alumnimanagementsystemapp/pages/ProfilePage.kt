@@ -75,16 +75,23 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
-            Icon(
-                imageVector = Icons.Rounded.CameraAlt, // camera icon
-                contentDescription = "Change Profile Image",
+
+            // Camera icon with rounded background
+            Box(
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(40.dp) // Adjust this size for the background
                     .clip(CircleShape) // Makes the background rounded
-                    .background(Color.Gray)
-                    .clickable { showImagePicker = true },
-                tint = Color.Green
-            )
+                    .background(Color.Gray) // Sets the background color to grey
+                    .clickable { showImagePicker = true }, // Clickable action on the box
+                contentAlignment = Alignment.Center // Center the icon within the box
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.CameraAlt, // Camera icon
+                    contentDescription = "Change Profile Image",
+                    modifier = Modifier.size(24.dp), // Size of the icon
+                    tint = Color.Green // Icon color
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
