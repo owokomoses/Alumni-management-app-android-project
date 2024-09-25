@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,10 +48,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModels()
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +62,9 @@ class MainActivity : ComponentActivity() {
             AlumniManagementSystemAppTheme {
 
                 Scaffold { paddingValues ->
-                    Screen(
-                        modifier = Modifier.padding(paddingValues)
+                    Navigation(
+                        modifier = Modifier.padding(paddingValues),
+                        authViewModel = authViewModel
                     )
                 }
             }
@@ -70,7 +74,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen(modifier: Modifier = Modifier){
+fun Screen(modifier: Modifier = Modifier,navController: NavController, authViewModel: AuthViewModel){
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState()
@@ -81,7 +85,7 @@ fun Screen(modifier: Modifier = Modifier){
     )
 
     val scope = rememberCoroutineScope()
-    
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -95,16 +99,20 @@ fun Screen(modifier: Modifier = Modifier){
             modifier = modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopBar(
-                    onOpenDrawer = {
-                        scope.launch {
-                            drawerState.apply{
-                                if (isClosed) open() else close()
+                Column {
+                    Spacer(modifier = Modifier.height(25.dp))
+
+                    TopBar(
+                        onOpenDrawer = {
+                            scope.launch {
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
+                                }
                             }
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+                        },
+                        scrollBehavior = scrollBehavior
+                    )
+                }
             }
         ) { paddingValues ->
             ScreenContent(
@@ -205,21 +213,21 @@ fun DrawerContent(modifier: Modifier = Modifier){
     Spacer(modifier = Modifier.height(4.dp))
 
     NavigationDrawerItem(
-           icon = {
-               Icon(
-                   imageVector = Icons.Rounded.AccountCircle,
-                   contentDescription = "Account"
-               )
-           },
-           label = {
-               Text(
-                   text = "Account",
-                   fontSize = 17.sp,
-                   modifier = Modifier.padding(16.dp)
-               )
-           },
-           selected = false,
-           onClick = { /*TODO*/ }
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.AccountCircle,
+                contentDescription = "Account"
+            )
+        },
+        label = {
+            Text(
+                text = "Account",
+                fontSize = 17.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        selected = false,
+        onClick = { /*TODO*/ }
     )
 
     Spacer(modifier = Modifier.height(4.dp))

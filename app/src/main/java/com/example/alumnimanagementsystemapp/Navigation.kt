@@ -34,7 +34,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 delay(3000)
                 when (authState.value) {
                     is AuthState.Authenticated -> {
-                        navController.navigate("home") {
+                        navController.navigate("main") {
                             popUpTo("welcome") { inclusive = true }
                         }
                     }
@@ -62,7 +62,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 if (authState.value is AuthState.Authenticated) {
                     // Delay for 3 seconds before navigating to HomePage
                     delay(3000)
-                    navController.navigate("home") {
+                    navController.navigate("main") {
                         popUpTo("loginScreen") { inclusive = true }
                     }
                 }
@@ -72,6 +72,11 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
         composable("signupScreen") {
             SignupScreen(navController = navController, authViewModel = authViewModel)
         }
+
+        composable("main") {
+            Screen(navController = navController, authViewModel = authViewModel)
+        }
+
 
         composable("signup") {
             SignupPage(modifier, navController, authViewModel)

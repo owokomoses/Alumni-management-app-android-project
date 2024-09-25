@@ -122,7 +122,7 @@ fun LoginPage(modifier: Modifier = Modifier,navController: NavController,authVie
             is AuthState.Authenticated -> {
                 val currentUser = Firebase.auth.currentUser
                 if (currentUser?.isEmailVerified == true) {
-                    navController.navigate("home") {
+                    navController.navigate("loginScreen") {
                         popUpTo("login") { inclusive = true }
                     }
                 }
