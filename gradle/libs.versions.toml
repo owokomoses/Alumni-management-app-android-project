@@ -22,6 +22,7 @@ runtimeLivedata = "1.7.0"
 ui = "1.7.1"
 uiTextGoogleFonts = "1.7.1"
 firebaseCrashlyticsBuildtools = "3.0.2"
+firebaseFirestoreKtx = "25.1.0"
 
 [libraries]
 androidx-compose-bom-vversion = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -54,6 +55,7 @@ material3 = { module = "androidx.compose.material3:material3", version.ref = "ma
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

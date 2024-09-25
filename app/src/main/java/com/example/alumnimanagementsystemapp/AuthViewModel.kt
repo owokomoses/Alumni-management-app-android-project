@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 
@@ -42,6 +44,8 @@ class AuthViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null && user.isEmailVerified) {
+                        // Save user info to Firestore
+                        saveUserToFirestore(user)
                         _authState.value = AuthState.Authenticated
                     } else {
                         // Email not verified
@@ -74,6 +78,8 @@ class AuthViewModel : ViewModel() {
                     user?.updateProfile(profileUpdates)
                         ?.addOnCompleteListener { profileUpdateTask ->
                             if (profileUpdateTask.isSuccessful) {
+                                // Save user info to Firestore
+                                saveUserToFirestore(user)
                                 _authState.value = AuthState.Authenticated
                             } else {
                                 _authState.value = AuthState.Error("Failed to update display name")
@@ -122,6 +128,24 @@ class AuthViewModel : ViewModel() {
                 _authState.postValue(AuthState.Error(e.message ?: "An error occurred"))
             }
         }
+    }
+
+    private fun saveUserToFirestore(user: FirebaseUser) {
+        val db = FirebaseFirestore.getInstance()
+        val userInfo = hashMapOf(
+            "uid" to user.uid,
+            "name" to user.displayName,
+            "email" to user.email
+        )
+
+        db.collection("users").document(user.uid)
+            .set(userInfo)
+            .addOnSuccessListener {
+                // Success
+            }
+            .addOnFailureListener {
+                // Handle failure
+            }
     }
 
 
