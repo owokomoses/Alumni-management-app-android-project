@@ -28,14 +28,12 @@ import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,15 +48,33 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.alumnimanagementsystemapp.AuthViewModel
+import androidx.compose.runtime.collectAsState
+
 
 @OptIn(androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi::class)
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
+
+    val currentUser = authViewModel.currentUser
+    val userId = currentUser?.uid ?: ""
+
+    // Observe the user profile state from the AuthViewModel
+    val userProfile by authViewModel.userProfileState.collectAsState()
+
     var showEditDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("John Doe") }
     var email by remember { mutableStateOf("johndoe@example.com") }
     var about by remember { mutableStateOf("Software Engineer with a passion for mobile development.") }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    var profileImageUrl by remember { mutableStateOf<String?>(null) }
+
+    // Fetch profile data from Firestore on login
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty()) {
+            authViewModel.fetchProfileFromFirestore(userId) // Trigger the Firestore fetch from AuthViewModel
+        }
+    }
+
 
     // Set up the image picker launcher
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -76,24 +92,35 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
             modifier = Modifier.size(100.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
-            // Display the selected image or a default placeholder
-            profileImageUri?.let { uri ->
+            // Display the saved image URL or the selected image
+            if (profileImageUrl != null) {
                 Image(
-                    painter = rememberAsyncImagePainter(uri), // Use Coil or another image loading library here
+                    painter = rememberAsyncImagePainter(profileImageUrl),
                     contentDescription = "Profile Image",
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
-            } ?: Image(
-                painter = painterResource(id = com.example.alumnimanagementsystemapp.R.drawable.profile), // Replace with actual image
-                contentDescription = "Profile Image",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+            } else {
+                profileImageUri?.let { uri ->
+                    Image(
+                        painter = rememberAsyncImagePainter(uri),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } ?: Image(
+                    painter = painterResource(id = com.example.alumnimanagementsystemapp.R.drawable.profile),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
             // Camera icon with rounded background
             Box(
                 modifier = Modifier
@@ -147,14 +174,16 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
     // Edit dialog
     if (showEditDialog) {
         EditBottomSheet(
-            initialName = name,
-            initialAbout = about,
-            initialEmail = email, // Pass the initial email value
+            initialName = userProfile.name,
+            initialAbout = userProfile.about,
+            initialEmail = userProfile.email,
             onDismiss = { showEditDialog = false },
-            onSave = { newName, newAbout, newEmail -> // Include email in the save function
+            onSave = { newName, newAbout, newEmail ->
+                authViewModel.saveProfileToFirestore(userId, newName, newAbout, newEmail, profileImageUri)
+                // Update the UI state with the new values after saving
                 name = newName
                 about = newAbout
-                email = newEmail // Update email
+                email = newEmail
                 showEditDialog = false
             }
         )
@@ -265,6 +294,11 @@ fun EditBottomSheet(
         }
     }
 }
+
+
+
+
+
 
 
 

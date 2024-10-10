@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.coil.compose)
     implementation(libs.androidx.benchmark.macro)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

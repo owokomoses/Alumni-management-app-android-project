@@ -1,5 +1,9 @@
 package com.example.alumnimanagementsystemapp
 
+import android.content.ContentValues.TAG
+import android.net.Uri
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,11 +14,20 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val _userProfileState = MutableStateFlow(UserProfile())
+    val userProfileState: StateFlow<UserProfile> get() = _userProfileState
+    private val db = FirebaseFirestore.getInstance()
+    private val storageRef = FirebaseStorage.getInstance().reference
+    val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+
 
 
     private val _authState = MutableLiveData<AuthState>()
@@ -149,6 +162,62 @@ class AuthViewModel : ViewModel() {
             }
     }
 
+    // Fetch user profile from Firestore
+    fun fetchProfileFromFirestore(userId: String) {
+        db.collection("profiles").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    _userProfileState.value = document.toObject(UserProfile::class.java) ?: UserProfile()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting document: ", exception)
+            }
+    }
+
+    fun saveProfileToFirestore(userId: String, name: String, about: String, email: String, profileImageUri: Uri?) {
+        val profileData = hashMapOf(
+            "name" to name,
+            "about" to about,
+            "email" to email,
+            // Optionally handle profileImageUri for uploading and storing URL
+            "profileImageUrl" to profileImageUri?.toString() // Convert URI to String if needed
+        )
+
+        db.collection("profiles").document(userId).set(profileData)
+            .addOnSuccessListener {
+                Log.d(TAG, "Profile successfully written!")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error writing document", e)
+            }
+    }
+
+
+
+    // Save profile to Firestore including image upload
+    fun saveProfileToFirestore(userId: String, name: String, email: String, about: String) {
+        val profileData = hashMapOf(
+            "name" to name,
+            "email" to email,
+            "about" to about
+        )
+
+        // Save profile to 'profiles/{userId}' document
+        db.collection("profiles").document(userId).set(profileData)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Profile successfully created/updated!")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error writing profile", e)
+            }
+    }
+
+
+
+
+
+
 
     fun signout() {
         auth.signOut()
@@ -164,3 +233,10 @@ sealed class AuthState {
     object ResetPasswordSent : AuthState()
     data class Error(val message: String) : AuthState()
 }
+
+data class UserProfile(
+    val name: String = "",
+    val email: String = "",
+    val about: String = "",
+    val profileImageUrl: String? = null
+)
