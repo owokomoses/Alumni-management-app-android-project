@@ -21,15 +21,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -52,8 +55,9 @@ import com.example.alumnimanagementsystemapp.AuthViewModel
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
     var showEditDialog by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf("") }
-    var about by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("John Doe") }
+    var email by remember { mutableStateOf("johndoe@example.com") }
+    var about by remember { mutableStateOf("Software Engineer with a passion for mobile development.") }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
 
     // Set up the image picker launcher
@@ -120,6 +124,16 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Email section (moved after the name)
+        EditableTextField(
+            label = "Email",
+            value = email, // Display the email
+            onEditClick = { showEditDialog = true },
+            icon = Icons.Default.Email // Use appropriate icon for email
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // About section
         EditableTextField(
             label = "About",
@@ -135,10 +149,12 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
         EditBottomSheet(
             initialName = name,
             initialAbout = about,
+            initialEmail = email, // Pass the initial email value
             onDismiss = { showEditDialog = false },
-            onSave = { newName, newAbout ->
+            onSave = { newName, newAbout, newEmail -> // Include email in the save function
                 name = newName
                 about = newAbout
+                email = newEmail // Update email
                 showEditDialog = false
             }
         )
@@ -177,63 +193,78 @@ fun EditableTextField(label: String, value: String, onEditClick: () -> Unit, ico
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditBottomSheet(
     initialName: String,
     initialAbout: String,
+    initialEmail: String,
     onDismiss: () -> Unit,
-    onSave: (String, String) -> Unit
+    onSave: (String, String, String) -> Unit
 ) {
     var newName by remember { mutableStateOf(initialName) }
     var newAbout by remember { mutableStateOf(initialAbout) }
+    var newEmail by remember { mutableStateOf(initialEmail) }
 
-    BottomSheetScaffold(
-        sheetContent = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text("Edit Profile", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = newName,
-                    onValueChange = { newName = it },
-                    label = { Text("Name") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Person, // Add icon here
-                            contentDescription = "Name Icon"
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = newAbout,
-                    onValueChange = { newAbout = it },
-                    label = { Text("About") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Info, // Add icon here
-                            contentDescription = "About Icon"
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = { onSave(newName, newAbout) }) {
-                    Text("Save")
-                }
-            }
-        },
-        scaffoldState = rememberBottomSheetScaffoldState(),
-        sheetPeekHeight = 0.dp
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() }
     ) {
-        // Content behind the bottom sheet
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Edit Profile", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = newName,
+                onValueChange = { newName = it },
+                label = { Text("Name") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Person,
+                        contentDescription = "Name Icon"
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = newEmail, // Add email input field
+                onValueChange = { newEmail = it },
+                label = { Text("Email") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Email, // Use an appropriate icon for email
+                        contentDescription = "Email Icon"
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = newAbout,
+                onValueChange = { newAbout = it },
+                label = { Text("About") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Info,
+                        contentDescription = "About Icon"
+                    )
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onSave(newName, newAbout, newEmail) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save")
+            }
+        }
     }
 }
+
+
+
