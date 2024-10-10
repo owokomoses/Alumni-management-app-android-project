@@ -1,7 +1,9 @@
 package com.example.alumnimanagementsystemapp.pages
 
 
-import androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,7 +25,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -37,24 +38,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.alumnimanagementsystemapp.AuthViewModel
 
 @OptIn(androidx.benchmark.perfetto.ExperimentalPerfettoTraceProcessorApi::class)
 @Composable
 fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
     var showEditDialog by remember { mutableStateOf(false) }
-    var showImagePicker by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     var about by remember { mutableStateOf("") }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Set up the image picker launcher
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        profileImageUri = uri // Save the selected image URI
+    }
 
     Column(
         modifier = Modifier
@@ -67,22 +72,31 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
             modifier = Modifier.size(100.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
-            Image(
-                painter = painterResource(id = com.example.alumnimanagementsystemapp.R.drawable.profile), // replace with actual image
+            // Display the selected image or a default placeholder
+            profileImageUri?.let { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(uri), // Use Coil or another image loading library here
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } ?: Image(
+                painter = painterResource(id = com.example.alumnimanagementsystemapp.R.drawable.profile), // Replace with actual image
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
-
             // Camera icon with rounded background
             Box(
                 modifier = Modifier
                     .size(40.dp) // Adjust this size for the background
                     .clip(CircleShape) // Makes the background rounded
                     .background(Color.Gray) // Sets the background color to grey
-                    .clickable { showImagePicker = true }, // Clickable action on the box
+                    .clickable { launcher.launch("image/*") }, // Clickable action on the box
                 contentAlignment = Alignment.Center // Center the icon within the box
             ) {
                 Icon(
@@ -114,14 +128,6 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
             icon = Icons.Default.Info// Add appropriate icon for about
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Phone section (can be static or editable)
-        Text(
-            text = "+254 773 379546",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 
     // Edit dialog
@@ -137,15 +143,6 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
             }
         )
     }
-
-    // Show image picker (Dialog/BottomSheet for changing profile image)
-    if (showImagePicker) {
-        ImagePickerDialog(
-            onDismiss = { showImagePicker = false },
-            onImageSelected = { /* Handle image selection */ }
-        )
-    }
-
 }
 
 
@@ -240,34 +237,3 @@ fun EditBottomSheet(
         // Content behind the bottom sheet
     }
 }
-@Composable
-fun ImagePickerDialog(onDismiss: () -> Unit, onImageSelected: (String) -> Unit) {
-    Dialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text("Pick an image", fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Placeholder for image picker functionality
-            Button(onClick = {
-                onImageSelected("path/to/new/image")
-                onDismiss()
-            }) {
-                Text("Select Image")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    }
-}
-
-
-
-
