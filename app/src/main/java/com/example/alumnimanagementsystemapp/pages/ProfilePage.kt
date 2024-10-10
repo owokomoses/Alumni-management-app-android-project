@@ -62,9 +62,9 @@ fun ProfilePage(modifier: Modifier = Modifier, navController: NavController, aut
     val userProfile by authViewModel.userProfileState.collectAsState()
 
     var showEditDialog by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf("John Doe") }
-    var email by remember { mutableStateOf("johndoe@example.com") }
-    var about by remember { mutableStateOf("Software Engineer with a passion for mobile development.") }
+    var name by remember { mutableStateOf(userProfile.name ?: "") }
+    var email by remember { mutableStateOf(userProfile.email ?: "") }
+    var about by remember { mutableStateOf(userProfile.about ?: "") }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
@@ -208,7 +208,11 @@ fun EditableTextField(label: String, value: String, onEditClick: () -> Unit, ico
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(label, fontSize = 14.sp, color = Color.Gray)
-                Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    if (value.isEmpty()) "Not provided" else value, // Show "Not provided" if empty
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
         Icon(
@@ -286,7 +290,7 @@ fun EditBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { onSave(newName, newAbout, newEmail) },
+                onClick = { onSave(newName.ifEmpty { "Not provided" }, newAbout.ifEmpty { "Not provided" }, newEmail.ifEmpty { "Not provided" }) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save")
