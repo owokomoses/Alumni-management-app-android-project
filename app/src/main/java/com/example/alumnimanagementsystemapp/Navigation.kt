@@ -30,7 +30,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             WelcomeScreen(navController = navController)
 
             LaunchedEffect(Unit) {
-                delay(3000)
+                delay(1000)
                 when (authState.value) {
                     is AuthState.Authenticated -> {
                         navController.navigate("main") {

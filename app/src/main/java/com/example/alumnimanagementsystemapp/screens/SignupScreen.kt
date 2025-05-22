@@ -35,8 +35,8 @@ fun SignupScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     LaunchedEffect(authState.value) {
         if (authState.value is AuthState.Authenticated) {
-            // Delay for 3 seconds before navigating to VerificationPage
-            delay(3000)
+            // Delay for 1 second before navigating to VerificationPage
+            delay(1000)
             navController.navigate("verificationPage") {
                 popUpTo("signupScreen") { inclusive = true }
             }
