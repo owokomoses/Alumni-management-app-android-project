@@ -1,39 +1,120 @@
 package com.example.alumnimanagementsystemapp.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.R
 import kotlinx.coroutines.delay
 
 @Composable
 fun WelcomeScreen(navController: NavController) {
-    // Delay for 1 second
-    LaunchedEffect(Unit) {
-        delay(1000L) // Reduced from 3000ms to 1000ms
-        // Check authentication state and navigate accordingly
-        navController.navigate("login") {
-            popUpTo("welcome") { inclusive = true }
+    var showContent by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (showContent) 1f else 0.8f,
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+        label = "scale"
+    )
+
+    // Background gradient
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // Main content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Logo with animation
+            Image(
+                painter = painterResource(id = R.drawable.icon),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(180.dp)
+                    .scale(scale)
+                    .clip(RoundedCornerShape(24.dp))
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Welcome text with animation
+            AnimatedVisibility(
+                visible = showContent,
+                enter = fadeIn(animationSpec = tween(1000)),
+                exit = fadeOut(animationSpec = tween(1000))
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Welcome to",
+                        fontSize = 24.sp,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "IST Alumni Management",
+                        fontSize = 32.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Connect, Collaborate, and Grow",
+                        fontSize = 18.sp,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "Your gateway to a thriving IST alumni community",
+                        fontSize = 16.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                }
+            }
         }
     }
 
-    // Display the image in the center
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.welcome), // Replace with your image resource
-            contentDescription = "Welcome Image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+    // Launch animation and navigation
+    LaunchedEffect(Unit) {
+        showContent = true
+        delay(2000) // Show welcome screen for 2 seconds
+        navController.navigate("login") {
+            popUpTo("welcome") { inclusive = true }
+        }
     }
 }
