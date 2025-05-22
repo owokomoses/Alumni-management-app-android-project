@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
@@ -33,6 +34,22 @@ fun VerificationPage(
     var isResending by remember { mutableStateOf(false) }
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+
+    // Check verification status periodically
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(2000) // Check every 2 seconds
+            auth.currentUser?.reload()?.addOnSuccessListener {
+                if (auth.currentUser?.isEmailVerified == true) {
+                    // Email is verified, navigate to login screen
+                    navController.navigate("loginScreen") {
+                        popUpTo("verificationPage") { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(authState.value) {
         when (authState.value) {

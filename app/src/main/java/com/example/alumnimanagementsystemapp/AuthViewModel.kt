@@ -48,10 +48,20 @@ class AuthViewModel : ViewModel() {
 
 
     fun login(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) {
-            _authState.value = AuthState.Error("Email or password can't be empty")
+        if (email.isEmpty()) {
+            _authState.value = AuthState.Error("Email can't be empty")
             return
         }
+        
+        // If password is empty, this is an automatic login after verification
+        if (password.isEmpty()) {
+            val currentUser = auth.currentUser
+            if (currentUser?.isEmailVerified == true) {
+                _authState.value = AuthState.Authenticated
+                return
+            }
+        }
+
         _authState.value = AuthState.Loading
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->

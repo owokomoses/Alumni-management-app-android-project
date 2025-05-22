@@ -85,6 +85,7 @@ fun LoginPage(
             is AuthState.Authenticated -> {
                 val currentUser = Firebase.auth.currentUser
                 if (currentUser?.isEmailVerified == true) {
+                    authViewModel.login(currentUser.email ?: "", "")
                     navController.navigate("loginScreen") {
                         popUpTo("login") { inclusive = true }
                     }
