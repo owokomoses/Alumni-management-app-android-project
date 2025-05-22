@@ -94,7 +94,15 @@ class AuthViewModel : ViewModel() {
                             if (profileUpdateTask.isSuccessful) {
                                 // Save user info to Firestore
                                 saveUserToFirestore(user)
-                                _authState.value = AuthState.Authenticated
+                                // Send verification email
+                                user?.sendEmailVerification()
+                                    ?.addOnCompleteListener { verificationTask ->
+                                        if (verificationTask.isSuccessful) {
+                                            _authState.value = AuthState.VerificationEmailSent
+                                        } else {
+                                            _authState.value = AuthState.Error("Failed to send verification email")
+                                        }
+                                    }
                             } else {
                                 _authState.value = AuthState.Error("Failed to update display name")
                             }

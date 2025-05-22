@@ -55,12 +55,9 @@ fun SignupPage(
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> {
-                if (isProcessing) {
-                    delay(1000) // Reduced from 3000ms to 1000ms
-                    navController.navigate("signupScreen") {
-                        popUpTo("signup") { inclusive = true }
-                    }
+            is AuthState.VerificationEmailSent -> {
+                navController.navigate("signupScreen") {
+                    popUpTo("signup") { inclusive = true }
                 }
             }
             is AuthState.Error -> {
