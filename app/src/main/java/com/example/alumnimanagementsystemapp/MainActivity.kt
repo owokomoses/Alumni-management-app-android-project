@@ -332,7 +332,7 @@ fun DrawerContent(
                         .clip(RoundedCornerShape(20.dp))
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-    Text(
+                Text(
                     text = "IST Alumni Network",
                     color = Color.Red,
                     fontSize = 18.sp,
@@ -344,7 +344,7 @@ fun DrawerContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Navigation Items
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = Color.Red) },
             label = { 
                 Text(
@@ -355,7 +355,13 @@ fun DrawerContent(
                 )
             },
             selected = false,
-            onClick = { /* Navigate to home */ },
+            onClick = { 
+                navController.navigate("main") {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
@@ -363,70 +369,70 @@ fun DrawerContent(
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Profile",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
+                )
+            },
+            selected = false,
             onClick = { navController.navigate("profile") },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
         )
 
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Notifications",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
+                )
+            },
+            selected = false,
             onClick = { navController.navigate("notification") },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
         )
 
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Email, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Messages",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
+                )
+            },
+            selected = false,
             onClick = { /* Navigate to messages */ },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
-    )
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Logout Button
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Logout, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Logout",
                     color = Color.Red,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
-        onClick = {
+                )
+            },
+            selected = false,
+            onClick = {
                 authViewModel.signout()
                 navController.navigate("welcome") {
                     popUpTo("main") { inclusive = true }
