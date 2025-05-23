@@ -141,14 +141,14 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = userProfile.name.ifEmpty { "Add Your Name" },
+                        text = currentUser?.displayName ?: userProfile.name.ifEmpty { "Add Your Name" },
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red
                     )
 
                     Text(
-                        text = userProfile.email.ifEmpty { "Add Your Email" },
+                        text = currentUser?.email ?: userProfile.email.ifEmpty { "Add Your Email" },
                         fontSize = 16.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 4.dp)
@@ -247,7 +247,7 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                text = userProfile.email.ifEmpty { "Add your email" },
+                                text = currentUser?.email ?: userProfile.email.ifEmpty { "Add your email" },
                                 fontSize = 16.sp,
                                 color = Color.Gray
                             )
@@ -258,15 +258,19 @@ fun ProfileScreen(
         }
     }
 
-    // Edit Dialog
+    // Edit Dialog - Only for About section
     if (showEditDialog) {
-        EditProfileDialog(
-            initialName = userProfile.name,
+        EditAboutDialog(
             initialAbout = userProfile.about,
-            initialEmail = userProfile.email,
             onDismiss = { showEditDialog = false },
-            onSave = { newName, newAbout, newEmail ->
-                authViewModel.saveProfileToFirestore(userId, newName, newAbout, newEmail, profileImageUri)
+            onSave = { newAbout ->
+                authViewModel.saveProfileToFirestore(
+                    userId = userId,
+                    name = currentUser?.displayName ?: userProfile.name,
+                    about = newAbout,
+                    email = currentUser?.email ?: userProfile.email,
+                    profileImageUri = profileImageUri
+                )
                 showEditDialog = false
             }
         )
@@ -275,22 +279,18 @@ fun ProfileScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileDialog(
-    initialName: String,
+fun EditAboutDialog(
     initialAbout: String,
-    initialEmail: String,
     onDismiss: () -> Unit,
-    onSave: (String, String, String) -> Unit
+    onSave: (String) -> Unit
 ) {
-    var newName by remember { mutableStateOf(initialName) }
     var newAbout by remember { mutableStateOf(initialAbout) }
-    var newEmail by remember { mutableStateOf(initialEmail) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                "Edit Profile",
+                "Edit About",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Red
@@ -302,38 +302,6 @@ fun EditProfileDialog(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             ) {
-                OutlinedTextField(
-                    value = newName,
-                    onValueChange = { newName = it },
-                    label = { Text("Name") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Person,
-                            contentDescription = "Name Icon",
-                            tint = Color.Red
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = newEmail,
-                    onValueChange = { newEmail = it },
-                    label = { Text("Email") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Email,
-                            contentDescription = "Email Icon",
-                            tint = Color.Red
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 OutlinedTextField(
                     value = newAbout,
                     onValueChange = { newAbout = it },
@@ -353,11 +321,7 @@ fun EditProfileDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSave(
-                        newName.ifEmpty { "Not provided" },
-                        newAbout.ifEmpty { "Not provided" },
-                        newEmail.ifEmpty { "Not provided" }
-                    )
+                    onSave(newAbout.ifEmpty { "Not provided" })
                 }
             ) {
                 Text(
