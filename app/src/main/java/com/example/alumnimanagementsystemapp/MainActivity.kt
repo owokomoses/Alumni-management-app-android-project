@@ -5,69 +5,42 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Email
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Logout
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.alumnimanagementsystemapp.R
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
+    
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             AlumniManagementSystemAppTheme {
-
                 Scaffold { paddingValues ->
                     Navigation(
                         modifier = Modifier.padding(paddingValues),
@@ -86,8 +59,7 @@ fun Screen(
     navController: NavController,
     authViewModel: AuthViewModel,
     content: @Composable (PaddingValues) -> Unit
-){
-
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState()
     )
@@ -104,22 +76,23 @@ fun Screen(
         drawerState = drawerState,
         drawerContent = {
             Box(
-                modifier = Modifier.width(240.dp) // Set the desired width here
+                modifier = Modifier.width(240.dp)
             ) {
                 ModalDrawerSheet {
-                    DrawerContent(navController = navController, authViewModel = AuthViewModel())
+                    DrawerContent(
+                        navController = navController,
+                        authViewModel = authViewModel
+                    )
                 }
             }
         }
     ) {
-
         Scaffold(
             modifier = modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 Column {
                     Spacer(modifier = Modifier.height(25.dp))
-
                     TopBar(
                         onOpenDrawer = {
                             scope.launch {
@@ -129,41 +102,126 @@ fun Screen(
                             }
                         },
                         scrollBehavior = scrollBehavior,
-                        navController =navController
+                        navController = navController
                     )
                 }
             }
         ) { paddingValues ->
-//            ScreenContent(
-//                paddingValues = paddingValues
-//            )
             content(paddingValues)
         }
     }
 }
 
 @Composable
-fun ScreenContent(paddingValues: PaddingValues){
+fun ScreenContent(paddingValues: PaddingValues) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(
-            top = paddingValues.calculateTopPadding() +16.dp
+            top = paddingValues.calculateTopPadding() + 16.dp,
+            bottom = 16.dp
         )
     ) {
-        items(10) {
-            Box (
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .height(200.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.inversePrimary)
+        // Featured Alumni Section
+        item {
+            Text(
+                text = "Featured Alumni",
+                fontSize = 24.sp,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
 
+        // Featured Alumni Cards
+        items(3) { index ->
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFF5F5F5))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Alumni Name",
+                        fontSize = 20.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Class of 2023",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Software Engineer at Tech Company",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+
+        // Upcoming Events Section
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Upcoming Events",
+                fontSize = 24.sp,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
+
+        // Event Cards
+        items(3) { index ->
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFF5F5F5))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Alumni Meetup 2024",
+                        fontSize = 18.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "March 15, 2024 • 6:00 PM",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "IST Campus, Main Hall",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -174,26 +232,30 @@ fun TopBar(
     navController: NavController,
     onOpenDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
-){
+) {
     TopAppBar(
         modifier = modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(100.dp)),
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Color.White,
+            titleContentColor = Color.Gray
         ),
         windowInsets = WindowInsets(top = 0.dp),
         title = {
-            Text(text = "Search for Jobs",
-                color = MaterialTheme.colorScheme.onBackground.copy(0.7f),
-                fontSize = 17.sp
+            Text(
+                text = "IST Alumni Network",
+                color = Color.Red,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
         },
         navigationIcon = {
             Icon(
                 imageVector = Icons.Rounded.Menu,
                 contentDescription = "Menu",
+                tint = Color.Red,
                 modifier = Modifier
                     .clickable {
                         onOpenDrawer()
@@ -205,14 +267,16 @@ fun TopBar(
         actions = {
             Icon(
                 imageVector = Icons.Rounded.Notifications,
-                contentDescription = null,
+                contentDescription = "Notifications",
+                tint = Color.Red,
                 modifier = Modifier
                     .size(30.dp)
             )
 
             Icon(
                 imageVector = Icons.Rounded.AccountCircle,
-                contentDescription = null,
+                contentDescription = "Profile",
+                tint = Color.Red,
                 modifier = Modifier
                     .clickable {
                         navController.navigate("profile") {
@@ -233,110 +297,78 @@ fun DrawerContent(
     modifier: Modifier = Modifier,
     navController: NavController,
     authViewModel: AuthViewModel
-){
-    Text(
-        text = "Alumni Management System",
-        fontSize = 24.sp,
-        modifier = Modifier.padding(16.dp)
-    )
-
-    HorizontalDivider()
-
-    Spacer(modifier = Modifier.height(4.dp))
-
-    NavigationDrawerItem(
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Home,
-                contentDescription = "Home"
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        // Drawer Header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.icon),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
-        },
-        label = {
-            Text(
-                text = "Home",
-                fontSize = 17.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        },
-        selected = false,
-        onClick = {
-            // Navigate to the Home page when clicked
-            navController.navigate("main") {
-                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
         }
-    )
 
-    Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-    NavigationDrawerItem(
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = "Users"
-            )
-        },
-        label = {
-            Text(
-                text = "Users",
-                fontSize = 17.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        },
-        selected = false,
-        onClick = {
-            navController.navigate("users") {
-                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
-    )
+        // Navigation Items
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = Color.Red) },
+            label = { Text("Home", color = Color.Gray) },
+            selected = false,
+            onClick = { /* Navigate to home */ },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
-    Spacer(modifier = Modifier.height(4.dp))
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
+            label = { Text("Profile", color = Color.Gray) },
+            selected = false,
+            onClick = { navController.navigate("profile") },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
-    NavigationDrawerItem(
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Email,
-                contentDescription = "Email"
-            )
-        },
-        label = {
-            Text(
-                text = "Email",
-                fontSize = 17.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        },
-        selected = false,
-        onClick = { /*TODO*/ }
-    )
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.Red) },
+            label = { Text("Notifications", color = Color.Gray) },
+            selected = false,
+            onClick = { navController.navigate("notification") },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
-    Spacer(modifier = Modifier.height(350.dp))
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Rounded.Email, contentDescription = null, tint = Color.Red) },
+            label = { Text("Messages", color = Color.Gray) },
+            selected = false,
+            onClick = { /* Navigate to messages */ },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
-    NavigationDrawerItem(
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Logout,
-                contentDescription = "Logout"
-            )
-        },
-        label = {
-            Text(
-                text = "Logout",
-                fontSize = 17.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        },
-        selected = false,
-        onClick = {
-            navController.navigate("logoutScreen") {
-                popUpTo("main") { inclusive = true }
-            }
-        }
-    )
+        Spacer(modifier = Modifier.weight(1f))
 
+        // Logout Button
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Rounded.Logout, contentDescription = null, tint = Color.Red) },
+            label = { Text("Logout", color = Color.Red) },
+            selected = false,
+            onClick = {
+                authViewModel.signout()
+                navController.navigate("welcome") {
+                    popUpTo("main") { inclusive = true }
+                }
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+    }
 }

@@ -15,7 +15,7 @@ import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.pages.Users
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
-import com.example.alumnimanagementsystemapp.screens.LogoutScreen
+
 import com.example.alumnimanagementsystemapp.screens.SignupScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
 import kotlinx.coroutines.delay
@@ -51,6 +51,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("login") {
             LoginPage(modifier, navController, authViewModel)
+
         }
 
         composable("loginScreen") {
@@ -71,19 +72,18 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             SignupScreen(navController = navController, authViewModel = authViewModel)
         }
 
-        composable("logoutScreen") {
-            LogoutScreen(navController = navController)
-        }
-
         composable("main") {
             Screen(navController = navController, authViewModel = authViewModel) { paddingValues ->
                 ScreenContent(paddingValues = paddingValues)
             }
         }
 
+
+
         composable("signup") {
             SignupPage(modifier, navController, authViewModel)
         }
+
 
         composable("users") {
             Users(modifier, navController, authViewModel)
@@ -104,5 +104,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
         composable("forgotPasswordPage") {
             ForgotPasswordPage(modifier, navController, authViewModel)
         }
+
+
     }
 }   
