@@ -76,9 +76,12 @@ fun Screen(
         drawerState = drawerState,
         drawerContent = {
             Box(
-                modifier = Modifier.width(240.dp)
+                modifier = Modifier.width(280.dp)
             ) {
-                ModalDrawerSheet {
+                ModalDrawerSheet(
+                    drawerContainerColor = Color.White,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
                     DrawerContent(
                         navController = navController,
                         authViewModel = authViewModel
@@ -89,10 +92,10 @@ fun Screen(
     ) {
         Scaffold(
             modifier = modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .statusBarsPadding(),
             topBar = {
                 Column {
-                    Spacer(modifier = Modifier.height(25.dp))
                     TopBar(
                         onOpenDrawer = {
                             scope.launch {
@@ -236,18 +239,20 @@ fun TopBar(
     TopAppBar(
         modifier = modifier
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(100.dp)),
+            .clip(RoundedCornerShape(16.dp)),
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
-            titleContentColor = Color.Gray
+            titleContentColor = Color.Gray,
+            navigationIconContentColor = Color.Red,
+            actionIconContentColor = Color.Red
         ),
-        windowInsets = WindowInsets(top = 0.dp),
+        windowInsets = WindowInsets(0.dp),
         title = {
             Text(
                 text = "IST Alumni Network",
                 color = Color.Red,
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
         },
@@ -271,6 +276,9 @@ fun TopBar(
                 tint = Color.Red,
                 modifier = Modifier
                     .size(30.dp)
+                    .clickable {
+                        navController.navigate("notification")
+                    }
             )
 
             Icon(
@@ -308,16 +316,27 @@ fun DrawerContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(vertical = 24.dp),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.icon),
-                contentDescription = "App Logo",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.icon),
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "IST Alumni Network",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -325,34 +344,70 @@ fun DrawerContent(
         // Navigation Items
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = Color.Red) },
-            label = { Text("Home", color = Color.Gray) },
+            label = { 
+                Text(
+                    "Home",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
             selected = false,
             onClick = { /* Navigate to home */ },
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
         )
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
-            label = { Text("Profile", color = Color.Gray) },
+            label = { 
+                Text(
+                    "Profile",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
             selected = false,
             onClick = { navController.navigate("profile") },
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
         )
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.Red) },
-            label = { Text("Notifications", color = Color.Gray) },
+            label = { 
+                Text(
+                    "Notifications",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
             selected = false,
             onClick = { navController.navigate("notification") },
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
         )
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Email, contentDescription = null, tint = Color.Red) },
-            label = { Text("Messages", color = Color.Gray) },
+            label = { 
+                Text(
+                    "Messages",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
             selected = false,
             onClick = { /* Navigate to messages */ },
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -360,7 +415,14 @@ fun DrawerContent(
         // Logout Button
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Logout, contentDescription = null, tint = Color.Red) },
-            label = { Text("Logout", color = Color.Red) },
+            label = { 
+                Text(
+                    "Logout",
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
             selected = false,
             onClick = {
                 authViewModel.signout()
@@ -368,7 +430,9 @@ fun DrawerContent(
                     popUpTo("main") { inclusive = true }
                 }
             },
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth()
         )
     }
 }
