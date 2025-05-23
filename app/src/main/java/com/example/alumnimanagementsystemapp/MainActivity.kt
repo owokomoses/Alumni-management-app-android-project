@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.R
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -86,7 +87,9 @@ fun Screen(
                 ) {
                     DrawerContent(
                         navController = navController,
-                        authViewModel = authViewModel
+                        authViewModel = authViewModel,
+                        drawerState = drawerState,
+                        scope = scope
                     )
                 }
             }
@@ -306,7 +309,9 @@ fun TopBar(
 fun DrawerContent(
     modifier: Modifier = Modifier,
     navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    drawerState: DrawerState,
+    scope: CoroutineScope
 ) {
     Column(
         modifier = modifier
@@ -356,10 +361,13 @@ fun DrawerContent(
             },
             selected = false,
             onClick = { 
-                navController.navigate("main") {
-                    popUpTo(navController.graph.startDestinationId) { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
+                scope.launch {
+                    drawerState.close()
+                    navController.navigate("main") {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             },
             modifier = Modifier
@@ -378,7 +386,12 @@ fun DrawerContent(
                 )
             },
             selected = false,
-            onClick = { navController.navigate("profile") },
+            onClick = { 
+                scope.launch {
+                    drawerState.close()
+                    navController.navigate("profile")
+                }
+            },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
@@ -395,7 +408,12 @@ fun DrawerContent(
                 )
             },
             selected = false,
-            onClick = { navController.navigate("notification") },
+            onClick = { 
+                scope.launch {
+                    drawerState.close()
+                    navController.navigate("notification")
+                }
+            },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
@@ -433,9 +451,12 @@ fun DrawerContent(
             },
             selected = false,
             onClick = {
-                authViewModel.signout()
-                navController.navigate("welcome") {
-                    popUpTo("main") { inclusive = true }
+                scope.launch {
+                    drawerState.close()
+                    authViewModel.signout()
+                    navController.navigate("welcome") {
+                        popUpTo("main") { inclusive = true }
+                    }
                 }
             },
             modifier = Modifier
