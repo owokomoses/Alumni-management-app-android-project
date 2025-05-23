@@ -333,10 +333,8 @@ fun DrawerContent(
         },
         selected = false,
         onClick = {
-            authViewModel.signout() // Call to sign out from Firebase
-            Firebase.auth.signOut() // Logs the user out from Firebase
-            navController.navigate("login") { // Navigate back to login screen
-                popUpTo("main") { inclusive = true } // Clear main from the back stack
+            navController.navigate("logoutScreen") {
+                popUpTo("main") { inclusive = true }
             }
         }
     )
