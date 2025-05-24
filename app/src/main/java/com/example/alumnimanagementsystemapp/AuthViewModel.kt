@@ -58,6 +58,8 @@ class AuthViewModel : ViewModel() {
             val currentUser = auth.currentUser
             if (currentUser?.isEmailVerified == true) {
                 _authState.value = AuthState.Authenticated
+                // Fetch profile data immediately
+                fetchProfileFromFirestore(currentUser.uid)
                 return
             }
         }
@@ -70,6 +72,8 @@ class AuthViewModel : ViewModel() {
                     if (user != null && user.isEmailVerified) {
                         // Save user info to Firestore
                         saveUserToFirestore(user)
+                        // Fetch profile data immediately
+                        fetchProfileFromFirestore(user.uid)
                         _authState.value = AuthState.Authenticated
                     } else {
                         // Email not verified

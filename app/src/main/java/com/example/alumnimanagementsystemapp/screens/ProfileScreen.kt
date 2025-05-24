@@ -48,9 +48,9 @@ fun ProfileScreen(
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
-    // Fetch profile data from Firestore
+    // Only fetch if we don't have the data yet
     LaunchedEffect(userId) {
-        if (userId.isNotEmpty()) {
+        if (userId.isNotEmpty() && userProfile.name.isEmpty() && userProfile.email.isEmpty()) {
             authViewModel.fetchProfileFromFirestore(userId)
         }
     }
@@ -140,15 +140,16 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Use Firebase Auth data immediately while Firestore data loads
                     Text(
-                        text = currentUser?.displayName ?: userProfile.name.ifEmpty { "Add Your Name" },
+                        text = userProfile.name.ifEmpty { currentUser?.displayName ?: "Add Your Name" },
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red
                     )
 
                     Text(
-                        text = currentUser?.email ?: userProfile.email.ifEmpty { "Add Your Email" },
+                        text = userProfile.email.ifEmpty { currentUser?.email ?: "Add Your Email" },
                         fontSize = 16.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 4.dp)
