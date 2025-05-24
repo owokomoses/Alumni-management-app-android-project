@@ -11,8 +11,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,6 +34,8 @@ import com.example.alumnimanagementsystemapp.R
 import com.example.alumnimanagementsystemapp.ui.theme.AlumniManagementSystemAppTheme
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.layout.ContentScale
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -110,7 +114,8 @@ fun Screen(
                             }
                         },
                         scrollBehavior = scrollBehavior,
-                        navController = navController
+                        navController = navController,
+                        authViewModel = authViewModel
                     )
                 }
             }
@@ -121,9 +126,12 @@ fun Screen(
 }
 
 @Composable
-fun ScreenContent(paddingValues: PaddingValues) {
+fun ScreenContent(
+    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues
+) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -239,7 +247,8 @@ fun TopBar(
     modifier: Modifier = Modifier,
     navController: NavController,
     onOpenDrawer: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    authViewModel: AuthViewModel
 ) {
     TopAppBar(
         modifier = modifier
@@ -286,11 +295,16 @@ fun TopBar(
                     }
             )
 
-            Icon(
-                imageVector = Icons.Rounded.AccountCircle,
-                contentDescription = "Profile",
-                tint = Color.Red,
+            // Profile Icon/Image
+            val userProfile by authViewModel.userProfileState.collectAsState()
+            val currentUser = authViewModel.currentUser
+            val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
+            
+            Box(
                 modifier = Modifier
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .background(Color.Red.copy(alpha = 0.1f))
                     .clickable {
                         navController.navigate("profile") {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -298,9 +312,34 @@ fun TopBar(
                             restoreState = true
                         }
                     }
-                    .padding(start = 8.dp, end = 16.dp)
-                    .size(30.dp)
-            )
+                    .padding(start = 8.dp, end = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (userProfile.profileImageUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(userProfile.profileImageUrl),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else if (displayName.isNotEmpty()) {
+                    Text(
+                        text = displayName.first().toString().uppercase(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Rounded.AccountCircle,
+                        contentDescription = "Profile",
+                        tint = Color.Red,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
         }
     )
 }
@@ -337,45 +376,45 @@ fun DrawerContent(
                         .clip(RoundedCornerShape(20.dp))
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-    Text(
+                Text(
                     text = "IST Alumni Network",
                     color = Color.Red,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
-    )
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Navigation Items
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Home",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
-        onClick = {
+                )
+            },
+            selected = false,
+            onClick = {
                 scope.launch {
                     drawerState.close()
-            navController.navigate("main") {
-                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
+                    navController.navigate("main") {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
-    )
+        )
 
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
             label = {
                 Text(
@@ -399,58 +438,58 @@ fun DrawerContent(
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Notifications",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
-        onClick = {
+                )
+            },
+            selected = false,
+            onClick = {
                 scope.launch {
                     drawerState.close()
                     navController.navigate("notification")
-            }
+                }
             },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
         )
 
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Email, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Messages",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
+                )
+            },
+            selected = false,
             onClick = { /* Navigate to messages */ },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth()
-    )
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Logout Button
-    NavigationDrawerItem(
+        NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Logout, contentDescription = null, tint = Color.Red) },
-        label = {
-            Text(
+            label = {
+                Text(
                     "Logout",
                     color = Color.Red,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
-            )
-        },
-        selected = false,
-        onClick = {
+                )
+            },
+            selected = false,
+            onClick = {
                 scope.launch {
                     drawerState.close()
                     authViewModel.signout()
