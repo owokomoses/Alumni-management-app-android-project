@@ -86,72 +86,81 @@ fun ProfileScreen(
                     // Profile Image with Camera Icon
                     Box(
                         modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                            .clickable { launcher.launch("image/*") },
+                            .size(120.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (profileImageUrl != null) {
-                            Image(
-                                painter = rememberAsyncImagePainter(profileImageUrl),
-                                contentDescription = "Profile Image",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            profileImageUri?.let { uri ->
+                        // Main profile image/letter circle
+                        Box(
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .clickable { launcher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (profileImageUrl != null) {
                                 Image(
-                                    painter = rememberAsyncImagePainter(uri),
+                                    painter = rememberAsyncImagePainter(profileImageUrl),
                                     contentDescription = "Profile Image",
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
-                            } ?: Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Red.copy(alpha = 0.1f))
-                                    .clip(CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
-                                if (displayName.isNotEmpty()) {
-                                    Text(
-                                        text = displayName.first().toString().uppercase(),
-                                        fontSize = 48.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Red
-                                    )
-                                } else {
+                            } else {
+                                profileImageUri?.let { uri ->
                                     Image(
-                                        painter = painterResource(id = R.drawable.profile),
-                                        contentDescription = "Default Profile Image",
+                                        painter = rememberAsyncImagePainter(uri),
+                                        contentDescription = "Profile Image",
                                         modifier = Modifier
-                                            .size(80.dp)
+                                            .fillMaxSize()
                                             .clip(CircleShape),
                                         contentScale = ContentScale.Crop
                                     )
+                                } ?: Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Red.copy(alpha = 0.1f))
+                                        .clip(CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
+                                    if (displayName.isNotEmpty()) {
+                                        Text(
+                                            text = displayName.first().toString().uppercase(),
+                                            fontSize = 48.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.profile),
+                                            contentDescription = "Default Profile Image",
+                                            modifier = Modifier
+                                                .size(80.dp)
+                                                .clip(CircleShape),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
                                 }
                             }
                         }
 
-                        // Camera Icon Overlay
+                        // Camera button at bottom right
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.3f))
-                                .clip(CircleShape),
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(Color.Red)
+                                .clickable { launcher.launch("image/*") }
+                                .align(Alignment.BottomEnd),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.CameraAlt,
                                 contentDescription = "Change Profile Image",
                                 tint = Color.White,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
