@@ -111,14 +111,32 @@ fun ProfileScreen(
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop
                                 )
-                            } ?: Image(
-                                painter = painterResource(id = R.drawable.profile),
-                                contentDescription = "Profile Image",
+                            } ?: Box(
                                 modifier = Modifier
-                                    .size(80.dp)
+                                    .fillMaxSize()
+                                    .background(Color.Red.copy(alpha = 0.1f))
                                     .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
+                                if (displayName.isNotEmpty()) {
+                                    Text(
+                                        text = displayName.first().toString().uppercase(),
+                                        fontSize = 48.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Red
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.profile),
+                                        contentDescription = "Default Profile Image",
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
                         }
 
                         // Camera Icon Overlay
