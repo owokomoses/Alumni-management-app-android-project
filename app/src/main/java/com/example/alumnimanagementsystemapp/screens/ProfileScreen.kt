@@ -305,6 +305,8 @@ fun ProfileScreen(
     if (showRoleDialog) {
         AlertDialog(
             onDismissRequest = { showRoleDialog = false },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp),
             title = {
                 Text(
                     "Select Role",
@@ -363,6 +365,12 @@ fun ProfileScreen(
                         )
                     }
 
+                    Divider(
+                        color = Color.Gray.copy(alpha = 0.2f),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
                     // Student Option
                     Row(
                         modifier = Modifier
@@ -409,10 +417,15 @@ fun ProfileScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showRoleDialog = false }) {
+                TextButton(
+                    onClick = { showRoleDialog = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color.Gray
+                    )
+                ) {
                     Text(
                         "Cancel",
-                        color = Color.Gray
+                        fontSize = 16.sp
                     )
                 }
             }
