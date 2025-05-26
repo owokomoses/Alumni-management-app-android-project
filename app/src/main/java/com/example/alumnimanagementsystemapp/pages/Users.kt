@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,124 +26,135 @@ import com.google.firebase.firestore.FirebaseFirestore
 data class User(
     val uid: String = "",
     val name: String = "",
-    val email: String = ""
+    val email: String = "",
+    val role: String = "student"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Users(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    authViewModel: AuthViewModel
-) {
-    var usersList by remember { mutableStateOf<List<User>>(emptyList()) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var selectedUser by remember { mutableStateOf<User?>(null) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+fun Users(modifier: Modifier, navController: NavController, authViewModel: AuthViewModel) {
+    val currentUser = authViewModel.currentUser
+    val currentUserRole = authViewModel.userProfileState.collectAsState().value.role
+    var users by remember { mutableStateOf<List<User>>(emptyList()) }
+    var showDeleteDialog by remember { mutableStateOf<User?>(null) }
+    var showRoleDialog by remember { mutableStateOf<User?>(null) }
+    val db = FirebaseFirestore.getInstance()
 
-    // Fetch users from Firestore
+    // Fetch users
     LaunchedEffect(Unit) {
-        val db = FirebaseFirestore.getInstance()
         db.collection("users")
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                
-                snapshot?.let {
-                    usersList = it.documents.mapNotNull { doc ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    users = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(User::class.java)?.copy(uid = doc.id)
                     }
                 }
             }
     }
 
-    Screen(
-        navController = navController,
-        authViewModel = authViewModel
-    ) { paddingValues ->
-        Box(
+    Screen(navController = navController, authViewModel = authViewModel) { paddingValues ->
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-        ) {
-            Column(
-            modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues)
-            ) {
-                // Header
-                Text(
-                    text = "Users",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Red,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-
-                // Users List
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp)
         ) {
-            items(usersList) { user ->
-                        UserCard(
-                            user = user,
-                            onEditClick = {
-                                selectedUser = user
-                                showEditDialog = true
-                            },
-                            onDeleteClick = {
-                                selectedUser = user
-                                showDeleteDialog = true
-                            }
-                        )
-                    }
+            // Header
+            Text(
+                text = "Users",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Red,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            // Users List
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(users) { user ->
+                    UserCard(
+                        user = user,
+                        isAdmin = currentUserRole == "admin",
+                        onDelete = { showDeleteDialog = user },
+                        onRoleChange = { showRoleDialog = user }
+                    )
                 }
             }
         }
     }
 
-    // Edit Dialog
-    if (showEditDialog && selectedUser != null) {
-        EditUserDialog(
-            user = selectedUser!!,
-            onDismiss = { showEditDialog = false },
-            onSave = { newName, newEmail ->
-                val db = FirebaseFirestore.getInstance()
-                db.collection("users").document(selectedUser!!.uid)
-                    .update(
-                        mapOf(
-                            "name" to newName,
-                            "email" to newEmail
-                        )
-                    )
-                showEditDialog = false
-            }
-        )
-    }
-
     // Delete Confirmation Dialog
-    if (showDeleteDialog && selectedUser != null) {
+    showDeleteDialog?.let { user ->
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+            onDismissRequest = { showDeleteDialog = null },
             title = { Text("Delete User") },
-            text = { Text("Are you sure you want to delete ${selectedUser!!.name}?") },
+            text = { Text("Are you sure you want to delete ${user.name}?") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val db = FirebaseFirestore.getInstance()
-                        db.collection("users").document(selectedUser!!.uid)
-                            .delete()
-                        showDeleteDialog = false
+                        db.collection("users").document(user.uid).delete()
+                        db.collection("profiles").document(user.uid).delete()
+                        showDeleteDialog = null
                     }
                 ) {
                     Text("Delete", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
+                TextButton(onClick = { showDeleteDialog = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Role Selection Dialog
+    showRoleDialog?.let { user ->
+        AlertDialog(
+            onDismissRequest = { showRoleDialog = null },
+            title = { Text("Change Role") },
+            text = {
+                Column {
+                    Text("Select role for ${user.name}:")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = {
+                                updateUserRole(user.uid, "admin")
+                                showRoleDialog = null
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (user.role == "admin") Color.Red else Color.Gray
+                            )
+                        ) {
+                            Text("Admin")
+                        }
+                        Button(
+                            onClick = {
+                                updateUserRole(user.uid, "student")
+                                showRoleDialog = null
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (user.role == "student") Color.Red else Color.Gray
+                            )
+                        ) {
+                            Text("Student")
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showRoleDialog = null }) {
                     Text("Cancel")
                 }
             }
@@ -155,13 +165,15 @@ fun Users(
 @Composable
 fun UserCard(
     user: User,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    isAdmin: Boolean,
+    onDelete: () -> Unit,
+    onRoleChange: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -172,51 +184,97 @@ fun UserCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(16.dp)
         ) {
+            // Name and Delete Button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = user.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = user.email,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                Row {
-                    IconButton(
-                        onClick = onEditClick,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = Color.Red,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = onDeleteClick,
-                        modifier = Modifier.size(32.dp)
-                    ) {
+                Text(
+                    text = user.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                if (isAdmin) {
+                    IconButton(onClick = onDelete) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red,
-                            modifier = Modifier.size(20.dp)
+                            contentDescription = "Delete User",
+                            tint = Color.Red
                         )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Email
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Email,
+                    contentDescription = "Email",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = user.email,
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Role
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = "Role",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            if (user.role == "admin") Color.Red.copy(alpha = 0.1f)
+                            else Color.Gray.copy(alpha = 0.1f)
+                        )
+                        .then(
+                            if (isAdmin) {
+                                Modifier.clickable { onRoleChange() }
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = user.role.uppercase(),
+                            fontSize = 14.sp,
+                            color = if (user.role == "admin") Color.Red else Color.Gray
+                        )
+                        if (isAdmin) {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Change Role",
+                                tint = if (user.role == "admin") Color.Red else Color.Gray,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -224,47 +282,18 @@ fun UserCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditUserDialog(
-    user: User,
-    onDismiss: () -> Unit,
-    onSave: (String, String) -> Unit
-) {
-    var name by remember { mutableStateOf(user.name) }
-    var email by remember { mutableStateOf(user.email) }
+private fun updateUserRole(userId: String, newRole: String) {
+    val db = FirebaseFirestore.getInstance()
+    val batch = db.batch()
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Edit User") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onSave(name, email) }
-            ) {
-                Text("Save", color = Color.Red)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
+    // Update in users collection
+    val userRef = db.collection("users").document(userId)
+    batch.update(userRef, "role", newRole)
+
+    // Update in profiles collection
+    val profileRef = db.collection("profiles").document(userId)
+    batch.update(profileRef, "role", newRole)
+
+    // Commit the batch
+    batch.commit()
 }
