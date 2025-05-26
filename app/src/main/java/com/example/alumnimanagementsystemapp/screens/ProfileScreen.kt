@@ -45,6 +45,7 @@ fun ProfileScreen(
     val context = LocalContext.current
 
     var showEditDialog by remember { mutableStateOf(false) }
+    var showRoleDialog by remember { mutableStateOf(false) }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
     var profileImageUrl by remember { mutableStateOf<String?>(null) }
 
@@ -156,13 +157,26 @@ fun ProfileScreen(
                                 else Color.Gray.copy(alpha = 0.1f)
                             )
                             .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clickable { showRoleDialog = true }
                     ) {
-                        Text(
-                            text = userProfile.role.uppercase(),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (userProfile.role == "admin") Color.Red else Color.Gray
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = userProfile.role.uppercase(),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (userProfile.role == "admin") Color.Red else Color.Gray
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Edit Role",
+                                tint = if (userProfile.role == "admin") Color.Red else Color.Gray,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -283,6 +297,124 @@ fun ProfileScreen(
                     profileImageUri = profileImageUri
                 )
                 showEditDialog = false
+            }
+        )
+    }
+
+    // Role Selection Dialog
+    if (showRoleDialog) {
+        AlertDialog(
+            onDismissRequest = { showRoleDialog = false },
+            title = {
+                Text(
+                    "Select Role",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    // Admin Option
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                authViewModel.saveProfileToFirestore(
+                                    userId = userId,
+                                    name = userProfile.name,
+                                    email = userProfile.email,
+                                    about = userProfile.about,
+                                    profileImageUri = profileImageUri,
+                                    role = "admin"
+                                )
+                                showRoleDialog = false
+                            }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = userProfile.role == "admin",
+                            onClick = {
+                                authViewModel.saveProfileToFirestore(
+                                    userId = userId,
+                                    name = userProfile.name,
+                                    email = userProfile.email,
+                                    about = userProfile.about,
+                                    profileImageUri = profileImageUri,
+                                    role = "admin"
+                                )
+                                showRoleDialog = false
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color.Red,
+                                unselectedColor = Color.Gray
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Admin",
+                            fontSize = 16.sp,
+                            color = if (userProfile.role == "admin") Color.Red else Color.Gray
+                        )
+                    }
+
+                    // Student Option
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                authViewModel.saveProfileToFirestore(
+                                    userId = userId,
+                                    name = userProfile.name,
+                                    email = userProfile.email,
+                                    about = userProfile.about,
+                                    profileImageUri = profileImageUri,
+                                    role = "student"
+                                )
+                                showRoleDialog = false
+                            }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = userProfile.role == "student",
+                            onClick = {
+                                authViewModel.saveProfileToFirestore(
+                                    userId = userId,
+                                    name = userProfile.name,
+                                    email = userProfile.email,
+                                    about = userProfile.about,
+                                    profileImageUri = profileImageUri,
+                                    role = "student"
+                                )
+                                showRoleDialog = false
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color.Red,
+                                unselectedColor = Color.Gray
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Student",
+                            fontSize = 16.sp,
+                            color = if (userProfile.role == "student") Color.Red else Color.Gray
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showRoleDialog = false }) {
+                    Text(
+                        "Cancel",
+                        color = Color.Gray
+                    )
+                }
             }
         )
     }

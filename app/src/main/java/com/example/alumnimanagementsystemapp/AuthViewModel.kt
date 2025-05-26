@@ -249,17 +249,20 @@ class AuthViewModel : ViewModel() {
         name: String,
         email: String,
         about: String,
-        profileImageUri: Uri? = null
+        profileImageUri: Uri? = null,
+        role: String? = null
     ) {
         if (userId.isEmpty()) return
 
-        val role = if (email.lowercase() == "owokomoses@gmail.com") "admin" else "student"
+        // If role is not provided, determine it based on email
+        val finalRole = role ?: if (email.lowercase() == "owokomoses@gmail.com") "admin" else "student"
+        
         val profileData = hashMapOf(
             "name" to name,
             "about" to about,
             "email" to email,
             "profileImageUrl" to profileImageUri?.toString(),
-            "role" to role
+            "role" to finalRole
         )
 
         db.collection("profiles").document(userId)
@@ -272,7 +275,7 @@ class AuthViewModel : ViewModel() {
                     email = email,
                     about = about,
                     profileImageUrl = profileImageUri?.toString(),
-                    role = role
+                    role = finalRole
                 )
             }
             .addOnFailureListener { e ->
