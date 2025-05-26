@@ -157,7 +157,13 @@ fun ProfileScreen(
                                 else Color.Gray.copy(alpha = 0.1f)
                             )
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .clickable { showRoleDialog = true }
+                            .then(
+                                if (userProfile.role == "admin") {
+                                    Modifier.clickable { showRoleDialog = true }
+                                } else {
+                                    Modifier
+                                }
+                            )
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -169,13 +175,15 @@ fun ProfileScreen(
                                 fontWeight = FontWeight.Medium,
                                 color = if (userProfile.role == "admin") Color.Red else Color.Gray
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Icon(
-                                imageVector = Icons.Rounded.Edit,
-                                contentDescription = "Edit Role",
-                                tint = if (userProfile.role == "admin") Color.Red else Color.Gray,
-                                modifier = Modifier.size(16.dp)
-                            )
+                            if (userProfile.role == "admin") {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = Icons.Rounded.Edit,
+                                    contentDescription = "Edit Role",
+                                    tint = Color.Red,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -301,8 +309,8 @@ fun ProfileScreen(
         )
     }
 
-    // Role Selection Dialog
-    if (showRoleDialog) {
+    // Role Selection Dialog - Only show for admin users
+    if (showRoleDialog && userProfile.role == "admin") {
         AlertDialog(
             onDismissRequest = { showRoleDialog = false },
             containerColor = Color.White,
