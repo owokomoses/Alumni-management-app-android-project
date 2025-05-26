@@ -1,74 +1,59 @@
 package com.example.alumnimanagementsystemapp.pages
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.Screen
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
-
-// ViewModel to handle fetching users from Firestore
-class UsersViewModel : ViewModel() {
-
-    val users = liveData {
-        val usersList = fetchUsers()
-        emit(usersList)
-    }
-
-    // Function to fetch users from Firestore
-    private suspend fun fetchUsers(): List<User> {
-        val firestore = FirebaseFirestore.getInstance()
-        val usersCollection = firestore.collection("users")
-        val usersSnapshot = usersCollection.get().await()
-        return usersSnapshot.documents.mapNotNull { it.toObject(User::class.java) }
-    }
-}
 
 data class User(
+    val uid: String = "",
     val name: String = "",
     val email: String = ""
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Users(
     modifier: Modifier = Modifier,
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
-    var usersList by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
+    var usersList by remember { mutableStateOf<List<User>>(emptyList()) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedUser by remember { mutableStateOf<User?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Fetch users from Firestore
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
         db.collection("users")
-            .get()
-            .addOnSuccessListener { result ->
-                usersList = result.documents.map { it.data ?: emptyMap() }
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) return@addSnapshotListener
+                
+                snapshot?.let {
+                    usersList = it.documents.mapNotNull { doc ->
+                        doc.toObject(User::class.java)?.copy(uid = doc.id)
+                    }
+                }
             }
     }
 
@@ -76,14 +61,193 @@ fun Users(
         navController = navController,
         authViewModel = authViewModel
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(Color.White)
         ) {
-            items(usersList) { user ->
-                Text(text = "User: ${user["name"]} (${user["email"]})", modifier = Modifier.padding(16.dp))
+            // Header
+            Text(
+                text = "Users",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Red,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            // Users List
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(usersList) { user ->
+                    UserCard(
+                        user = user,
+                        onEditClick = {
+                            selectedUser = user
+                            showEditDialog = true
+                        },
+                        onDeleteClick = {
+                            selectedUser = user
+                            showDeleteDialog = true
+                        }
+                    )
+                }
             }
         }
     }
+
+    // Edit Dialog
+    if (showEditDialog && selectedUser != null) {
+        EditUserDialog(
+            user = selectedUser!!,
+            onDismiss = { showEditDialog = false },
+            onSave = { newName, newEmail ->
+                val db = FirebaseFirestore.getInstance()
+                db.collection("users").document(selectedUser!!.uid)
+                    .update(
+                        mapOf(
+                            "name" to newName,
+                            "email" to newEmail
+                        )
+                    )
+                showEditDialog = false
+            }
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (showDeleteDialog && selectedUser != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete User") },
+            text = { Text("Are you sure you want to delete ${selectedUser!!.name}?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val db = FirebaseFirestore.getInstance()
+                        db.collection("users").document(selectedUser!!.uid)
+                            .delete()
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun UserCard(
+    user: User,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = user.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = user.email,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                Row {
+                    IconButton(onClick = onEditClick) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color.Red
+                        )
+                    }
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditUserDialog(
+    user: User,
+    onDismiss: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var name by remember { mutableStateOf(user.name) }
+    var email by remember { mutableStateOf(user.email) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit User") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onSave(name, email) }
+            ) {
+                Text("Save", color = Color.Red)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
