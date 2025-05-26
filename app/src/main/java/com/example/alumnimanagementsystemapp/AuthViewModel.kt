@@ -35,6 +35,19 @@ class AuthViewModel : ViewModel() {
 
     init {
         checkAuthStatus()
+        // Add listener for auth state changes
+        auth.addAuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null && user.isEmailVerified) {
+                _authState.value = AuthState.Authenticated
+                // Fetch profile data whenever auth state changes
+                fetchProfileFromFirestore(user.uid)
+            } else {
+                _authState.value = AuthState.Unauthenticated
+                // Clear profile data when user logs out
+                _userProfileState.value = UserProfile()
+            }
+        }
     }
 
     private fun checkAuthStatus() {
@@ -186,29 +199,60 @@ class AuthViewModel : ViewModel() {
 
     // Fetch user profile from Firestore
     fun fetchProfileFromFirestore(userId: String) {
-        db.collection("profiles").document(userId).get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    _userProfileState.value = document.toObject(UserProfile::class.java) ?: UserProfile()
+        if (userId.isEmpty()) return
+        
+        db.collection("profiles").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.w(TAG, "Error listening for profile updates: ", error)
+                    return@addSnapshotListener
                 }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting document: ", exception)
+
+                if (snapshot != null && snapshot.exists()) {
+                    val profile = snapshot.toObject(UserProfile::class.java)
+                    if (profile != null) {
+                        _userProfileState.value = profile
+                    }
+                } else {
+                    // If no profile exists, create one with basic user info
+                    val currentUser = auth.currentUser
+                    if (currentUser != null) {
+                        val newProfile = UserProfile(
+                            name = currentUser.displayName ?: "",
+                            email = currentUser.email ?: "",
+                            about = "",
+                            profileImageUrl = null
+                        )
+                        _userProfileState.value = newProfile
+                        // Save the new profile to Firestore
+                        saveProfileToFirestore(userId, newProfile.name, newProfile.email, newProfile.about)
+                    }
+                }
             }
     }
 
+    // Update saveProfileToFirestore to be more robust
     fun saveProfileToFirestore(userId: String, name: String, about: String, email: String, profileImageUri: Uri?) {
+        if (userId.isEmpty()) return
+
         val profileData = hashMapOf(
             "name" to name,
             "about" to about,
             "email" to email,
-            // Optionally handle profileImageUri for uploading and storing URL
-            "profileImageUrl" to profileImageUri?.toString() // Convert URI to String if needed
+            "profileImageUrl" to profileImageUri?.toString()
         )
 
-        db.collection("profiles").document(userId).set(profileData)
+        db.collection("profiles").document(userId)
+            .set(profileData)
             .addOnSuccessListener {
                 Log.d(TAG, "Profile successfully written!")
+                // Update the local state immediately
+                _userProfileState.value = UserProfile(
+                    name = name,
+                    email = email,
+                    about = about,
+                    profileImageUrl = profileImageUri?.toString()
+                )
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error writing document", e)
