@@ -263,8 +263,11 @@ fun TopBar(
         ),
         windowInsets = WindowInsets(0.dp),
         title = {
+            val userProfile by authViewModel.userProfileState.collectAsState()
+            val currentUser = authViewModel.currentUser
+            val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "IST Alumni Network" }
             Text(
-                text = "IST Alumni Network",
+                text = displayName,
                 color = Color.Red,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -418,7 +421,7 @@ fun DrawerContent(
             icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
             label = {
                 Text(
-                    "Profile",
+                    "Users",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
@@ -428,7 +431,7 @@ fun DrawerContent(
             onClick = { 
                 scope.launch {
                     drawerState.close()
-                    navController.navigate("profile")
+                    navController.navigate("users")
                 }
             },
             modifier = Modifier
