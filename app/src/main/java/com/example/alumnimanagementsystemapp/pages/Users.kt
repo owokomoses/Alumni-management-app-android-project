@@ -61,39 +61,46 @@ fun Users(
         navController = navController,
         authViewModel = authViewModel
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(Color.White)
         ) {
-            // Header
-            Text(
-                text = "Users",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Users List
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                items(usersList) { user ->
-                    UserCard(
-                        user = user,
-                        onEditClick = {
-                            selectedUser = user
-                            showEditDialog = true
-                        },
-                        onDeleteClick = {
-                            selectedUser = user
-                            showDeleteDialog = true
-                        }
-                    )
+                // Header
+                Text(
+                    text = "Users",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                // Users List
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(usersList) { user ->
+                        UserCard(
+                            user = user,
+                            onEditClick = {
+                                selectedUser = user
+                                showEditDialog = true
+                            },
+                            onDeleteClick = {
+                                selectedUser = user
+                                showDeleteDialog = true
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -154,32 +161,34 @@ fun UserCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = 2.dp
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
                         text = user.name,
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = user.email,
                         fontSize = 14.sp,
@@ -187,18 +196,26 @@ fun UserCard(
                     )
                 }
                 Row {
-                    IconButton(onClick = onEditClick) {
+                    IconButton(
+                        onClick = onEditClick,
+                        modifier = Modifier.size(32.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit",
-                            tint = Color.Red
+                            tint = Color.Red,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-                    IconButton(onClick = onDeleteClick) {
+                    IconButton(
+                        onClick = onDeleteClick,
+                        modifier = Modifier.size(32.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
-                            tint = Color.Red
+                            tint = Color.Red,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
