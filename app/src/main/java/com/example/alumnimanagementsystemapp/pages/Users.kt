@@ -295,5 +295,10 @@ private fun updateUserRole(userId: String, newRole: String) {
     batch.update(profileRef, "role", newRole)
 
     // Commit the batch
-    batch.commit()
+    batch.commit().addOnSuccessListener {
+        // Successfully updated role
+    }.addOnFailureListener { e ->
+        // Handle error
+        println("Error updating role: ${e.message}")
+    }
 }

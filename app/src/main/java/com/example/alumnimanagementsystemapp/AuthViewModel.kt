@@ -336,14 +336,16 @@ class AuthViewModel : ViewModel() {
                 batch.commit()
                     .addOnSuccessListener {
                         Log.d(TAG, "Profile and user data successfully written!")
-                        // Update the local state immediately
-                        _userProfileState.value = UserProfile(
-                            name = name,
-                            email = email,
-                            about = about,
-                            profileImageUrl = profileImageUri?.toString(),
-                            role = finalRole
-                        )
+                        // Only update the local state if we're updating the current user's profile
+                        if (userId == currentUser?.uid) {
+                            _userProfileState.value = UserProfile(
+                                name = name,
+                                email = email,
+                                about = about,
+                                profileImageUrl = profileImageUri?.toString(),
+                                role = finalRole
+                            )
+                        }
                     }
                     .addOnFailureListener { e ->
                         Log.w(TAG, "Error writing documents", e)
