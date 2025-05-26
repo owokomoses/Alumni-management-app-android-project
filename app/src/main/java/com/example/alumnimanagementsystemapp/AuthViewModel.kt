@@ -181,10 +181,14 @@ class AuthViewModel : ViewModel() {
 
     private fun saveUserToFirestore(user: FirebaseUser) {
         val db = FirebaseFirestore.getInstance()
+        // Set role based on email
+        val role = if (user.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
+        
         val userInfo = hashMapOf(
             "uid" to user.uid,
             "name" to user.displayName,
-            "email" to user.email
+            "email" to user.email,
+            "role" to role
         )
 
         db.collection("users").document(user.uid)
@@ -217,29 +221,45 @@ class AuthViewModel : ViewModel() {
                     // If no profile exists, create one with basic user info
                     val currentUser = auth.currentUser
                     if (currentUser != null) {
+                        val role = if (currentUser.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
                         val newProfile = UserProfile(
                             name = currentUser.displayName ?: "",
                             email = currentUser.email ?: "",
                             about = "",
-                            profileImageUrl = null
+                            profileImageUrl = null,
+                            role = role
                         )
                         _userProfileState.value = newProfile
-                        // Save the new profile to Firestore
-                        saveProfileToFirestore(userId, newProfile.name, newProfile.email, newProfile.about)
+                        // Save the new profile to Firestore with correct parameter order
+                        saveProfileToFirestore(
+                            userId = userId,
+                            name = currentUser.displayName ?: "",
+                            email = currentUser.email ?: "",
+                            about = "",
+                            profileImageUri = null
+                        )
                     }
                 }
             }
     }
 
-    // Update saveProfileToFirestore to be more robust
-    fun saveProfileToFirestore(userId: String, name: String, about: String, email: String, profileImageUri: Uri?) {
+    // Update saveProfileToFirestore to include role
+    fun saveProfileToFirestore(
+        userId: String,
+        name: String,
+        email: String,
+        about: String,
+        profileImageUri: Uri? = null
+    ) {
         if (userId.isEmpty()) return
 
+        val role = if (email.lowercase() == "owokomoses@gmail.com") "admin" else "student"
         val profileData = hashMapOf(
             "name" to name,
             "about" to about,
             "email" to email,
-            "profileImageUrl" to profileImageUri?.toString()
+            "profileImageUrl" to profileImageUri?.toString(),
+            "role" to role
         )
 
         db.collection("profiles").document(userId)
@@ -251,39 +271,14 @@ class AuthViewModel : ViewModel() {
                     name = name,
                     email = email,
                     about = about,
-                    profileImageUrl = profileImageUri?.toString()
+                    profileImageUrl = profileImageUri?.toString(),
+                    role = role
                 )
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error writing document", e)
             }
     }
-
-
-
-    // Save profile to Firestore including image upload
-    fun saveProfileToFirestore(userId: String, name: String, email: String, about: String) {
-        val profileData = hashMapOf(
-            "name" to name,
-            "email" to email,
-            "about" to about
-        )
-
-        // Save profile to 'profiles/{userId}' document
-        db.collection("profiles").document(userId).set(profileData)
-            .addOnSuccessListener {
-                Log.d("Firestore", "Profile successfully created/updated!")
-            }
-            .addOnFailureListener { e ->
-                Log.w("Firestore", "Error writing profile", e)
-            }
-    }
-
-
-
-
-
-
 
     fun signout() {
         // Clear the user profile state immediately
@@ -307,5 +302,6 @@ data class UserProfile(
     val name: String = "",
     val email: String = "",
     val about: String = "",
-    val profileImageUrl: String? = null
+    val profileImageUrl: String? = null,
+    val role: String = "student" // Default role is student
 )

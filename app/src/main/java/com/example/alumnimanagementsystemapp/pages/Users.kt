@@ -87,8 +87,8 @@ fun Users(
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(usersList) { user ->
+        ) {
+            items(usersList) { user ->
                         UserCard(
                             user = user,
                             onEditClick = {

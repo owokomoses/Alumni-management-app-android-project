@@ -98,9 +98,9 @@ fun ProfileScreen(
                                 .clickable { launcher.launch("image/*") },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (profileImageUrl != null) {
+                            if (userProfile.profileImageUrl != null) {
                                 Image(
-                                    painter = rememberAsyncImagePainter(profileImageUrl),
+                                    painter = rememberAsyncImagePainter(userProfile.profileImageUrl),
                                     contentDescription = "Profile Image",
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -108,41 +108,12 @@ fun ProfileScreen(
                                     contentScale = ContentScale.Crop
                                 )
                             } else {
-                                profileImageUri?.let { uri ->
-                                    Image(
-                                        painter = rememberAsyncImagePainter(uri),
-                                        contentDescription = "Profile Image",
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .clip(CircleShape),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } ?: Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Red.copy(alpha = 0.1f))
-                                        .clip(CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
-                                    if (displayName.isNotEmpty()) {
-                                        Text(
-                                            text = displayName.first().toString().uppercase(),
-                                            fontSize = 48.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Red
-                                        )
-                                    } else {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.profile),
-                                            contentDescription = "Default Profile Image",
-                                            modifier = Modifier
-                                                .size(80.dp)
-                                                .clip(CircleShape),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    }
-                                }
+                                Text(
+                                    text = userProfile.name.firstOrNull()?.toString()?.uppercase() ?: "U",
+                                    fontSize = 40.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
                             }
                         }
 
@@ -167,20 +138,32 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Use Firebase Auth data immediately while Firestore data loads
+                    // Name
                     Text(
-                        text = userProfile.name.ifEmpty { currentUser?.displayName ?: "Add Your Name" },
+                        text = userProfile.name,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Red
                     )
 
-                    Text(
-                        text = userProfile.email.ifEmpty { currentUser?.email ?: "Add Your Email" },
-                        fontSize = 16.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    // Role Badge
+                    Box(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(
+                                if (userProfile.role == "admin") Color.Red.copy(alpha = 0.1f)
+                                else Color.Gray.copy(alpha = 0.1f)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = userProfile.role.uppercase(),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = if (userProfile.role == "admin") Color.Red else Color.Gray
+                        )
+                    }
                 }
             }
 
