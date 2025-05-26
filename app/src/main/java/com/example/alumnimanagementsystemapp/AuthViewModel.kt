@@ -83,11 +83,19 @@ class AuthViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     if (user != null && user.isEmailVerified) {
-                        // Save user info to Firestore
-                        saveUserToFirestore(user)
-                        // Fetch profile data immediately
-                        fetchProfileFromFirestore(user.uid)
-                        _authState.value = AuthState.Authenticated
+                        // Check existing role before saving
+                        db.collection("users").document(user.uid)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                if (userDoc.exists()) {
+                                    // User exists, fetch their profile
+                                    fetchProfileFromFirestore(user.uid)
+                                } else {
+                                    // New user, save to Firestore
+                                    saveUserToFirestore(user)
+                                }
+                                _authState.value = AuthState.Authenticated
+                            }
                     } else {
                         // Email not verified
                         _authState.value =
@@ -181,23 +189,36 @@ class AuthViewModel : ViewModel() {
 
     private fun saveUserToFirestore(user: FirebaseUser) {
         val db = FirebaseFirestore.getInstance()
-        // Set role based on email
-        val role = if (user.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
         
-        val userInfo = hashMapOf(
-            "uid" to user.uid,
-            "name" to user.displayName,
-            "email" to user.email,
-            "role" to role
-        )
-
+        // Check if user already exists
         db.collection("users").document(user.uid)
-            .set(userInfo)
-            .addOnSuccessListener {
-                // Success
-            }
-            .addOnFailureListener {
-                // Handle failure
+            .get()
+            .addOnSuccessListener { userDoc ->
+                if (!userDoc.exists()) {
+                    // Only set role for new users
+                    val role = if (user.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
+                    
+                    val userInfo = hashMapOf(
+                        "uid" to user.uid,
+                        "name" to user.displayName,
+                        "email" to user.email,
+                        "role" to role
+                    )
+
+                    db.collection("users").document(user.uid)
+                        .set(userInfo)
+                        .addOnSuccessListener {
+                            // Success
+                            Log.d(TAG, "New user successfully created in Firestore")
+                        }
+                        .addOnFailureListener {
+                            // Handle failure
+                            Log.w(TAG, "Error creating new user in Firestore", it)
+                        }
+                } else {
+                    // User exists, no need to modify their role
+                    Log.d(TAG, "User already exists in Firestore")
+                }
             }
     }
 
@@ -221,23 +242,36 @@ class AuthViewModel : ViewModel() {
                     // If no profile exists, create one with basic user info
                     val currentUser = auth.currentUser
                     if (currentUser != null) {
-                        val role = if (currentUser.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
-                        val newProfile = UserProfile(
-                            name = currentUser.displayName ?: "",
-                            email = currentUser.email ?: "",
-                            about = "",
-                            profileImageUrl = null,
-                            role = role
-                        )
-                        _userProfileState.value = newProfile
-                        // Save the new profile to Firestore with correct parameter order
-                        saveProfileToFirestore(
-                            userId = userId,
-                            name = currentUser.displayName ?: "",
-                            email = currentUser.email ?: "",
-                            about = "",
-                            profileImageUri = null
-                        )
+                        // Check if user exists in users collection first
+                        db.collection("users").document(userId)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                val role = if (userDoc.exists()) {
+                                    // Use existing role from users collection
+                                    userDoc.getString("role") ?: "student"
+                                } else {
+                                    // Default to student for new users
+                                    "student"
+                                }
+                                
+                                val newProfile = UserProfile(
+                                    name = currentUser.displayName ?: "",
+                                    email = currentUser.email ?: "",
+                                    about = "",
+                                    profileImageUrl = null,
+                                    role = role
+                                )
+                                _userProfileState.value = newProfile
+                                // Save the new profile to Firestore
+                                saveProfileToFirestore(
+                                    userId = userId,
+                                    name = currentUser.displayName ?: "",
+                                    email = currentUser.email ?: "",
+                                    about = "",
+                                    profileImageUri = null,
+                                    role = role
+                                )
+                            }
                     }
                 }
             }
@@ -254,32 +288,66 @@ class AuthViewModel : ViewModel() {
     ) {
         if (userId.isEmpty()) return
 
-        // If role is not provided, determine it based on email
-        val finalRole = role ?: if (email.lowercase() == "owokomoses@gmail.com") "admin" else "student"
-        
-        val profileData = hashMapOf(
-            "name" to name,
-            "about" to about,
-            "email" to email,
-            "profileImageUrl" to profileImageUri?.toString(),
-            "role" to finalRole
-        )
+        // Get the current role from Firestore to ensure persistence
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { userDoc ->
+                val currentRole = userDoc.getString("role") ?: "student"
+                val finalRole = if (currentRole == "admin") {
+                    // If user is already admin, keep admin role
+                    "admin"
+                } else if (_userProfileState.value.role == "admin") {
+                    // If current user is admin, they can set any role
+                    role ?: currentRole
+                } else {
+                    // If current user is not admin, keep their existing role
+                    currentRole
+                }
 
-        db.collection("profiles").document(userId)
-            .set(profileData)
-            .addOnSuccessListener {
-                Log.d(TAG, "Profile successfully written!")
-                // Update the local state immediately
-                _userProfileState.value = UserProfile(
-                    name = name,
-                    email = email,
-                    about = about,
-                    profileImageUrl = profileImageUri?.toString(),
-                    role = finalRole
+                // Save to profiles collection
+                val profileData = hashMapOf(
+                    "name" to name,
+                    "about" to about,
+                    "email" to email,
+                    "profileImageUrl" to profileImageUri?.toString(),
+                    "role" to finalRole
                 )
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error writing document", e)
+
+                // Save to users collection
+                val userData = hashMapOf(
+                    "uid" to userId,
+                    "name" to name,
+                    "email" to email,
+                    "role" to finalRole
+                )
+
+                // Save to both collections
+                val batch = db.batch()
+                
+                // Update profiles collection
+                val profileRef = db.collection("profiles").document(userId)
+                batch.set(profileRef, profileData)
+                
+                // Update users collection
+                val userRef = db.collection("users").document(userId)
+                batch.set(userRef, userData)
+
+                // Commit the batch
+                batch.commit()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Profile and user data successfully written!")
+                        // Update the local state immediately
+                        _userProfileState.value = UserProfile(
+                            name = name,
+                            email = email,
+                            about = about,
+                            profileImageUrl = profileImageUri?.toString(),
+                            role = finalRole
+                        )
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(TAG, "Error writing documents", e)
+                    }
             }
     }
 
