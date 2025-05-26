@@ -250,101 +250,108 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     authViewModel: AuthViewModel
 ) {
-    TopAppBar(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White,
-            titleContentColor = Color.Gray,
-            navigationIconContentColor = Color.Red,
-            actionIconContentColor = Color.Red
-        ),
-        windowInsets = WindowInsets(0.dp),
-        title = {
-            val userProfile by authViewModel.userProfileState.collectAsState()
-            val currentUser = authViewModel.currentUser
-            val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "IST Alumni Network" }
-            Text(
-                text = displayName,
-                color = Color.Red,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        navigationIcon = {
-            Icon(
-                imageVector = Icons.Rounded.Menu,
-                contentDescription = "Menu",
-                tint = Color.Red,
-                modifier = Modifier
-                    .clickable {
-                        onOpenDrawer()
-                    }
-                    .padding(start = 16.dp, end = 8.dp)
-                    .size(28.dp)
-            )
-        },
-        actions = {
-            Icon(
-                imageVector = Icons.Rounded.Notifications,
-                contentDescription = "Notifications",
-                tint = Color.Red,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable {
-                        navController.navigate("notification")
-                    }
-            )
-
-            // Profile Icon/Image
-            val userProfile by authViewModel.userProfileState.collectAsState()
-            val currentUser = authViewModel.currentUser
-            val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
-            
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(Color.Red.copy(alpha = 0.1f))
-                    .clickable {
-                        navController.navigate("profile") {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF5F5F5))
+            .padding(vertical = 8.dp)
+    ) {
+        TopAppBar(
+            modifier = modifier
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White,
+                titleContentColor = Color.Gray,
+                navigationIconContentColor = Color.Red,
+                actionIconContentColor = Color.Red
+            ),
+            windowInsets = WindowInsets(0.dp),
+            title = {
+                val userProfile by authViewModel.userProfileState.collectAsState()
+                val currentUser = authViewModel.currentUser
+                val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "IST Alumni Network" }
+                Text(
+                    text = displayName,
+                    color = Color.Red,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            navigationIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Menu,
+                    contentDescription = "Menu",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .clickable {
+                            onOpenDrawer()
                         }
+                        .padding(start = 16.dp, end = 8.dp)
+                        .size(28.dp)
+                )
+            },
+            actions = {
+                Icon(
+                    imageVector = Icons.Rounded.Notifications,
+                    contentDescription = "Notifications",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable {
+                            navController.navigate("notification")
+                        }
+                )
+
+                // Profile Icon/Image
+                val userProfile by authViewModel.userProfileState.collectAsState()
+                val currentUser = authViewModel.currentUser
+                val displayName = userProfile.name.ifEmpty { currentUser?.displayName ?: "" }
+                
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(Color.Red.copy(alpha = 0.1f))
+                        .clickable {
+                            navController.navigate("profile") {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                        .padding(start = 8.dp, end = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (userProfile.profileImageUrl != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(userProfile.profileImageUrl),
+                            contentDescription = "Profile Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else if (displayName.isNotEmpty()) {
+                        Text(
+                            text = displayName.first().toString().uppercase(),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Red
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.AccountCircle,
+                            contentDescription = "Profile",
+                            tint = Color.Red,
+                            modifier = Modifier.size(30.dp)
+                        )
                     }
-                    .padding(start = 8.dp, end = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (userProfile.profileImageUrl != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(userProfile.profileImageUrl),
-                        contentDescription = "Profile Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                } else if (displayName.isNotEmpty()) {
-                    Text(
-                        text = displayName.first().toString().uppercase(),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Rounded.AccountCircle,
-                        contentDescription = "Profile",
-                        tint = Color.Red,
-                        modifier = Modifier.size(30.dp)
-                    )
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable

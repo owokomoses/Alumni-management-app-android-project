@@ -67,9 +67,9 @@ fun Users(
                 .background(Color.White)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
             ) {
                 // Header
                 Text(
