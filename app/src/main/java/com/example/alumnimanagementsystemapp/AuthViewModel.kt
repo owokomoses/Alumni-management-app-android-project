@@ -286,6 +286,9 @@ class AuthViewModel : ViewModel() {
 
 
     fun signout() {
+        // Clear the user profile state immediately
+        _userProfileState.value = UserProfile()
+        // Then sign out
         auth.signOut()
         _authState.value = AuthState.Unauthenticated
     }
