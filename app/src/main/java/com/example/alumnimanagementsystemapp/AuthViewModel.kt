@@ -34,7 +34,6 @@ class AuthViewModel : ViewModel() {
     val authState: LiveData<AuthState> = _authState
 
     init {
-        checkAuthStatus()
         // Add listener for auth state changes
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
@@ -47,6 +46,15 @@ class AuthViewModel : ViewModel() {
                 // Clear profile data when user logs out
                 _userProfileState.value = UserProfile()
             }
+        }
+
+        // Initial auth state check
+        val currentUser = auth.currentUser
+        if (currentUser != null && currentUser.isEmailVerified) {
+            _authState.value = AuthState.Authenticated
+            fetchProfileFromFirestore(currentUser.uid)
+        } else {
+            _authState.value = AuthState.Unauthenticated
         }
     }
 
