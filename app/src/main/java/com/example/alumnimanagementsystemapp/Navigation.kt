@@ -18,7 +18,6 @@ import com.example.alumnimanagementsystemapp.screens.ProfileScreen
 import com.example.alumnimanagementsystemapp.screens.SignupScreen
 import com.example.alumnimanagementsystemapp.screens.WelcomeScreen
 import kotlinx.coroutines.delay
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
@@ -30,7 +29,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             WelcomeScreen(navController = navController)
 
             LaunchedEffect(Unit) {
-                delay(2000) // Show welcome screen for 2 seconds
+                delay(1000)
                 when (authState.value) {
                     is AuthState.Authenticated -> {
                         navController.navigate("main") {
@@ -43,17 +42,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                         }
                     }
                     else -> {
-                        // If state is unclear, check Firebase Auth directly
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        if (currentUser?.isEmailVerified == true) {
-                            navController.navigate("main") {
-                                popUpTo("welcome") { inclusive = true }
-                            }
-                        } else {
-                            navController.navigate("login") {
-                                popUpTo("welcome") { inclusive = true }
-                            }
-                        }
+                        // Default case: If state is unclear, stay on welcome
                     }
                 }
             }

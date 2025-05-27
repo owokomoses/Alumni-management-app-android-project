@@ -34,6 +34,7 @@ class AuthViewModel : ViewModel() {
     val authState: LiveData<AuthState> = _authState
 
     init {
+        checkAuthStatus()
         // Add listener for auth state changes
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
@@ -46,15 +47,6 @@ class AuthViewModel : ViewModel() {
                 // Clear profile data when user logs out
                 _userProfileState.value = UserProfile()
             }
-        }
-
-        // Initial auth state check
-        val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.isEmailVerified) {
-            _authState.value = AuthState.Authenticated
-            fetchProfileFromFirestore(currentUser.uid)
-        } else {
-            _authState.value = AuthState.Unauthenticated
         }
     }
 
@@ -100,9 +92,9 @@ class AuthViewModel : ViewModel() {
                                     fetchProfileFromFirestore(user.uid)
                                 } else {
                                     // New user, save to Firestore
-                                    saveUserToFirestore(user)
+                        saveUserToFirestore(user)
                                 }
-                                _authState.value = AuthState.Authenticated
+                        _authState.value = AuthState.Authenticated
                             }
                     } else {
                         // Email not verified
@@ -206,21 +198,21 @@ class AuthViewModel : ViewModel() {
                     // Only set role for new users
                     val role = if (user.email?.lowercase() == "owokomoses@gmail.com") "admin" else "student"
                     
-                    val userInfo = hashMapOf(
-                        "uid" to user.uid,
-                        "name" to user.displayName,
+        val userInfo = hashMapOf(
+            "uid" to user.uid,
+            "name" to user.displayName,
                         "email" to user.email,
                         "role" to role
-                    )
+        )
 
-                    db.collection("users").document(user.uid)
-                        .set(userInfo)
-                        .addOnSuccessListener {
-                            // Success
+        db.collection("users").document(user.uid)
+            .set(userInfo)
+            .addOnSuccessListener {
+                // Success
                             Log.d(TAG, "New user successfully created in Firestore")
-                        }
-                        .addOnFailureListener {
-                            // Handle failure
+            }
+            .addOnFailureListener {
+                // Handle failure
                             Log.w(TAG, "Error creating new user in Firestore", it)
                         }
                 } else {
@@ -313,10 +305,10 @@ class AuthViewModel : ViewModel() {
                 }
 
                 // Save to profiles collection
-                val profileData = hashMapOf(
-                    "name" to name,
-                    "about" to about,
-                    "email" to email,
+        val profileData = hashMapOf(
+            "name" to name,
+            "about" to about,
+            "email" to email,
                     "profileImageUrl" to profileImageUri?.toString(),
                     "role" to finalRole
                 )
@@ -324,8 +316,8 @@ class AuthViewModel : ViewModel() {
                 // Save to users collection
                 val userData = hashMapOf(
                     "uid" to userId,
-                    "name" to name,
-                    "email" to email,
+            "name" to name,
+            "email" to email,
                     "role" to finalRole
                 )
 
@@ -342,20 +334,18 @@ class AuthViewModel : ViewModel() {
 
                 // Commit the batch
                 batch.commit()
-                    .addOnSuccessListener {
+            .addOnSuccessListener {
                         Log.d(TAG, "Profile and user data successfully written!")
-                        // Only update the local state if we're updating the current user's profile
-                        if (userId == currentUser?.uid) {
-                            _userProfileState.value = UserProfile(
-                                name = name,
-                                email = email,
-                                about = about,
-                                profileImageUrl = profileImageUri?.toString(),
-                                role = finalRole
-                            )
-                        }
-                    }
-                    .addOnFailureListener { e ->
+                        // Update the local state immediately
+                        _userProfileState.value = UserProfile(
+                            name = name,
+                            email = email,
+                            about = about,
+                            profileImageUrl = profileImageUri?.toString(),
+                            role = finalRole
+                        )
+            }
+            .addOnFailureListener { e ->
                         Log.w(TAG, "Error writing documents", e)
                     }
             }

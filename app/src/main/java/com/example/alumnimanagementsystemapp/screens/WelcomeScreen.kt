@@ -109,8 +109,12 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 
-    // Launch animation
+    // Launch animation and navigation
     LaunchedEffect(Unit) {
         showContent = true
+        delay(2000) // Show welcome screen for 2 seconds
+        navController.navigate("login") {
+            popUpTo("welcome") { inclusive = true }
+        }
     }
 }

@@ -284,21 +284,8 @@ fun UserCard(
 
 private fun updateUserRole(userId: String, newRole: String) {
     val db = FirebaseFirestore.getInstance()
-    val batch = db.batch()
-
-    // Update in users collection
+    
+    // Only update in users collection
     val userRef = db.collection("users").document(userId)
-    batch.update(userRef, "role", newRole)
-
-    // Update in profiles collection
-    val profileRef = db.collection("profiles").document(userId)
-    batch.update(profileRef, "role", newRole)
-
-    // Commit the batch
-    batch.commit().addOnSuccessListener {
-        // Successfully updated role
-    }.addOnFailureListener { e ->
-        // Handle error
-        println("Error updating role: ${e.message}")
-    }
+    userRef.update("role", newRole)
 }
