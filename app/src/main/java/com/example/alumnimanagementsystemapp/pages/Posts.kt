@@ -57,7 +57,11 @@ class DateConverter {
 @Composable
 fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthViewModel) {
     var showNewPostDialog by remember { mutableStateOf(false) }
+    var showEditPostDialog by remember { mutableStateOf(false) }
+    var selectedJobPost by remember { mutableStateOf<JobPost?>(null) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
     var jobPosts by remember { mutableStateOf<List<JobPost>>(emptyList()) }
+    val currentUser = authViewModel.currentUser
     val db = FirebaseFirestore.getInstance()
 
     // Fetch job posts
@@ -129,8 +133,19 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(jobPosts) { post ->
-                    JobPostCard(post = post)
+                items(jobPosts) { jobPost ->
+                    JobPostCard(
+                        jobPost = jobPost,
+                        onEdit = { post ->
+                            selectedJobPost = post
+                            showEditPostDialog = true
+                        },
+                        onDelete = { post ->
+                            selectedJobPost = post
+                            showDeleteConfirmation = true
+                        },
+                        currentUserEmail = currentUser?.email
+                    )
                 }
             }
         }
@@ -159,159 +174,221 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
             }
         )
     }
+
+    // Edit Post Dialog
+    if (showEditPostDialog && selectedJobPost != null) {
+        NewJobPostDialog(
+            onDismiss = { 
+                showEditPostDialog = false
+                selectedJobPost = null
+            },
+            onPost = { title, company, location, description, requirements, salary, type, deadline ->
+                val jobPost = hashMapOf(
+                    "title" to title,
+                    "company" to company,
+                    "location" to location,
+                    "description" to description,
+                    "requirements" to requirements.split(",").map { it.trim() },
+                    "salary" to salary,
+                    "type" to type,
+                    "deadline" to DateConverter.toTimestamp(deadline)
+                )
+
+                // Use the document ID directly
+                db.collection("jobPosts")
+                    .document(selectedJobPost?.id ?: "")
+                    .update(jobPost)
+                    .addOnSuccessListener {
+                        showEditPostDialog = false
+                        selectedJobPost = null
+                    }
+                    .addOnFailureListener { e ->
+                        // Handle error
+                    }
+            },
+            initialTitle = selectedJobPost?.title ?: "",
+            initialCompany = selectedJobPost?.company ?: "",
+            initialLocation = selectedJobPost?.location ?: "",
+            initialDescription = selectedJobPost?.description ?: "",
+            initialRequirements = selectedJobPost?.requirements?.joinToString(", ") ?: "",
+            initialSalary = selectedJobPost?.salary ?: "",
+            initialType = selectedJobPost?.type ?: "",
+            initialDeadline = selectedJobPost?.deadline
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (showDeleteConfirmation && selectedJobPost != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteConfirmation = false
+                selectedJobPost = null
+            },
+            title = { Text("Delete Post") },
+            text = { Text("Are you sure you want to delete this job post?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // Use the document ID directly
+                        db.collection("jobPosts")
+                            .document(selectedJobPost?.id ?: "")
+                            .delete()
+                            .addOnSuccessListener {
+                                showDeleteConfirmation = false
+                                selectedJobPost = null
+                            }
+                            .addOnFailureListener { e ->
+                                // Handle error
+                            }
+                    }
+                ) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmation = false
+                        selectedJobPost = null
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-fun JobPostCard(post: JobPost) {
+fun JobPostCard(
+    jobPost: JobPost,
+    modifier: Modifier = Modifier,
+    onEdit: (JobPost) -> Unit,
+    onDelete: (JobPost) -> Unit,
+    currentUserEmail: String?
+) {
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
     
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Title and Company
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = jobPost.title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+                
+                // Only show edit/delete buttons if the current user is the post creator
+                if (currentUserEmail == jobPost.postedBy) {
+                    Row {
+                        IconButton(onClick = { onEdit(jobPost) }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Edit Post",
+                                tint = Color.Red
+                            )
+                        }
+                        IconButton(onClick = { onDelete(jobPost) }) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = "Delete Post",
+                                tint = Color.Red
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = post.title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = post.company,
+                text = jobPost.company,
                 fontSize = 16.sp,
                 color = Color.Gray
             )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Location and Type
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Rounded.LocationOn,
-                        contentDescription = "Location",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = post.location,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.Red.copy(alpha = 0.1f))
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = post.type,
-                        fontSize = 14.sp,
-                        color = Color.Red
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Salary
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Rounded.AttachMoney,
-                    contentDescription = "Salary",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = post.salary,
+                    text = jobPost.location,
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = jobPost.type,
+                    fontSize = 14.sp,
+                    color = Color.Red,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = jobPost.description,
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Requirements:",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
+            Text(
+                text = jobPost.requirements.joinToString(", "),
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Salary: ${jobPost.salary}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Posted: ${dateFormat.format(jobPost.postedDate)}",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
             }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Description
-            Text(
-                text = post.description,
-                fontSize = 14.sp,
-                color = Color.DarkGray,
-                maxLines = 3
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Requirements
-            Text(
-                text = "Requirements:",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            
-            post.requirements.take(3).forEach { requirement ->
-                Row(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = null,
-                        tint = Color.Red,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = requirement,
-                        fontSize = 14.sp,
-                        color = Color.DarkGray
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Posted date and deadline
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+
+            if (jobPost.deadline != null) {
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Posted: ${dateFormat.format(post.postedDate)}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
+                    text = "Application Deadline: ${dateFormat.format(jobPost.deadline)}",
+                    fontSize = 14.sp,
+                    color = Color.Red,
+                    fontWeight = FontWeight.Medium
                 )
-                
-                post.deadline?.let { deadline ->
-                    Text(
-                        text = "Deadline: ${dateFormat.format(deadline)}",
-                        fontSize = 12.sp,
-                        color = Color.Red
-                    )
-                }
             }
         }
     }
@@ -330,23 +407,31 @@ fun NewJobPostDialog(
         salary: String,
         type: String,
         deadline: Date?
-    ) -> Unit
+    ) -> Unit,
+    initialTitle: String = "",
+    initialCompany: String = "",
+    initialLocation: String = "",
+    initialDescription: String = "",
+    initialRequirements: String = "",
+    initialSalary: String = "",
+    initialType: String = "Full-time",
+    initialDeadline: Date? = null
 ) {
-    var title by remember { mutableStateOf("") }
-    var company by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var requirements by remember { mutableStateOf("") }
-    var salary by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("Full-time") }
-    var deadline by remember { mutableStateOf<Date?>(null) }
+    var title by remember { mutableStateOf(initialTitle) }
+    var company by remember { mutableStateOf(initialCompany) }
+    var location by remember { mutableStateOf(initialLocation) }
+    var description by remember { mutableStateOf(initialDescription) }
+    var requirements by remember { mutableStateOf(initialRequirements) }
+    var salary by remember { mutableStateOf(initialSalary) }
+    var type by remember { mutableStateOf(initialType) }
+    var deadline by remember { mutableStateOf(initialDeadline) }
     var expanded by remember { mutableStateOf(false) }
     
     val jobTypes = listOf("Full-time", "Part-time", "Contract", "Internship", "Remote")
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create Job Post", color = Color.Red) },
+        title = { Text(if (initialTitle.isEmpty()) "Create Job Post" else "Edit Job Post", color = Color.Red) },
         text = {
             Column(
                 modifier = Modifier
@@ -442,7 +527,7 @@ fun NewJobPostDialog(
                     containerColor = Color.Red
                 )
             ) {
-                Text("Post")
+                Text(if (initialTitle.isEmpty()) "Post" else "Update")
             }
         },
         dismissButton = {
