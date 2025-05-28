@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
 import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.NotificationPage
+import com.example.alumnimanagementsystemapp.pages.Posts
 import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.pages.Users
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
@@ -54,16 +55,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("loginScreen") {
             LoginScreen(navController = navController, authViewModel = authViewModel)
-
-            LaunchedEffect(authState.value) {
-                if (authState.value is AuthState.Authenticated) {
-                    // Delay for 3 seconds before navigating to HomePage
-                    delay(3000)
-                    navController.navigate("main") {
-                        popUpTo("loginScreen") { inclusive = true }
-                    }
-                }
-            }
         }
 
         composable("signupScreen") {
@@ -84,8 +75,8 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             Users(modifier, navController, authViewModel)
         }
 
-        composable("notification") {
-            NotificationPage(modifier, navController, authViewModel)
+        composable("posts") {
+            Posts(modifier, navController, authViewModel)
         }
 
         composable("profile") {
@@ -98,6 +89,44 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("forgotPasswordPage") {
             ForgotPasswordPage(modifier, navController, authViewModel)
+        }
+    }
+
+    // Handle authentication state changes
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Authenticated -> {
+                // If we're not already on the main screen, navigate there
+                if (navController.currentDestination?.route != "main") {
+                    navController.navigate("main") {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            }
+            is AuthState.Unauthenticated -> {
+                // If we're not already on the login screen, navigate there
+                if (navController.currentDestination?.route != "login") {
+                    navController.navigate("login") {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
+            else -> {
+                // Handle other states if needed
+            }
         }
     }
 }   

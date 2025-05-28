@@ -293,17 +293,6 @@ fun TopBar(
                 )
             },
             actions = {
-                Icon(
-                    imageVector = Icons.Rounded.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clickable {
-                            navController.navigate("notification")
-                        }
-                )
-
                 // Profile Icon/Image
                 val userProfile by authViewModel.userProfileState.collectAsState()
                 val currentUser = authViewModel.currentUser
@@ -408,7 +397,7 @@ fun DrawerContent(
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = false,
+            selected = navController.currentDestination?.route == "main",
             onClick = {
                 scope.launch {
                     drawerState.close()
@@ -434,11 +423,13 @@ fun DrawerContent(
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = false,
+            selected = navController.currentDestination?.route == "users",
             onClick = { 
                 scope.launch {
                     drawerState.close()
-                    navController.navigate("users")
+                    navController.navigate("users") {
+                        launchSingleTop = true
+                    }
                 }
             },
             modifier = Modifier
@@ -447,20 +438,22 @@ fun DrawerContent(
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Rounded.Notifications, contentDescription = null, tint = Color.Red) },
+            icon = { Icon(Icons.Rounded.Article, contentDescription = null, tint = Color.Red) },
             label = {
                 Text(
-                    "Notifications",
+                    "Posts",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = false,
+            selected = navController.currentDestination?.route == "posts",
             onClick = {
                 scope.launch {
                     drawerState.close()
-                    navController.navigate("notification")
+                    navController.navigate("posts") {
+                        launchSingleTop = true
+                    }
                 }
             },
             modifier = Modifier
@@ -478,7 +471,7 @@ fun DrawerContent(
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = false,
+            selected = navController.currentDestination?.route == "messages",
             onClick = { /* Navigate to messages */ },
             modifier = Modifier
                 .padding(vertical = 4.dp)
