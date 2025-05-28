@@ -45,14 +45,23 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         if (currentUser?.isEmailVerified == true) {
             // Automatically log in
             authViewModel.login(currentUser.email ?: "", "")
-            
-            // Wait for 2 seconds to show the loading screen
-            delay(2000)
-            
-            // Navigate to main dashboard
-            navController.navigate("main") {
-                popUpTo("loginScreen") { inclusive = true }
+        }
+    }
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Authenticated -> {
+                // Wait for 2 seconds to show the loading screen
+                delay(2000)
+                // Navigate to main dashboard
+                navController.navigate("main") {
+                    popUpTo("loginScreen") { inclusive = true }
+                }
             }
+            is AuthState.Error -> {
+                // Handle error state if needed
+            }
+            else -> Unit
         }
     }
 
@@ -92,7 +101,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Logging You In",
+                        text = "Logging In",
                         fontSize = 28.sp,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold
@@ -101,7 +110,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Please wait while we access your account",
+                        text = "Please wait while we verify your credentials",
                         fontSize = 18.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center

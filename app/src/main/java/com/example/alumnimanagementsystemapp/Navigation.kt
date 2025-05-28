@@ -29,7 +29,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             WelcomeScreen(navController = navController)
 
             LaunchedEffect(Unit) {
-                delay(1000)
+                delay(2000) // Show welcome screen for 2 seconds
                 when (authState.value) {
                     is AuthState.Authenticated -> {
                         navController.navigate("main") {
