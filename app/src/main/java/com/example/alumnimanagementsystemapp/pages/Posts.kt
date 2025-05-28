@@ -274,7 +274,10 @@ fun JobPostCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F5F5)
+        )
     ) {
         Column(
             modifier = Modifier
