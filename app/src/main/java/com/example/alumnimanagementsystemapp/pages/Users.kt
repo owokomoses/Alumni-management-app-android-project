@@ -157,7 +157,11 @@ fun Users(modifier: Modifier, navController: NavController, authViewModel: AuthV
                 TextButton(onClick = { showRoleDialog = null }) {
                     Text("Cancel")
                 }
-            }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp),
+            titleContentColor = Color.Red,
+            textContentColor = Color.Gray
         )
     }
 }
