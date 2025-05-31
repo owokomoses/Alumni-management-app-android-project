@@ -35,13 +35,11 @@ fun WelcomeScreen(navController: NavController) {
         label = "scale"
     )
 
-    // Background gradient
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Main content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -49,7 +47,6 @@ fun WelcomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo with animation
             Image(
                 painter = painterResource(id = R.drawable.icon),
                 contentDescription = "App Logo",
@@ -61,20 +58,21 @@ fun WelcomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Welcome text with animation
             AnimatedVisibility(
                 visible = showContent,
                 enter = fadeIn(animationSpec = tween(1000)),
                 exit = fadeOut(animationSpec = tween(1000))
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Welcome to",
                         fontSize = 24.sp,
                         color = Color.Gray,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -83,7 +81,8 @@ fun WelcomeScreen(navController: NavController) {
                         text = "IST Alumni Management",
                         fontSize = 32.sp,
                         color = Color.Red,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -92,7 +91,8 @@ fun WelcomeScreen(navController: NavController) {
                         text = "Connect, Collaborate, and Grow",
                         fontSize = 18.sp,
                         color = Color.Gray,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -109,7 +109,6 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 
-    // Launch animation
     LaunchedEffect(Unit) {
         showContent = true
     }

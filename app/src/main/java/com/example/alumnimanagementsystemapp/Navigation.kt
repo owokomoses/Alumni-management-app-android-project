@@ -113,8 +113,9 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 }
             }
             is AuthState.Unauthenticated -> {
-                // If we're not already on the login screen, navigate there
-                if (navController.currentDestination?.route != "login") {
+                // Only navigate to login if we're not already there and not on welcome screen
+                if (navController.currentDestination?.route != "login" && 
+                    navController.currentDestination?.route != "welcome") {
                     navController.navigate("login") {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true

@@ -413,29 +413,33 @@ fun DrawerContent(
                 .fillMaxWidth()
         )
 
-        NavigationDrawerItem(
-            icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
-            label = {
-                Text(
-                    "Users",
-                    color = Color.Gray,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            },
-            selected = navController.currentDestination?.route == "users",
-            onClick = { 
-                scope.launch {
-                    drawerState.close()
-                    navController.navigate("users") {
-                        launchSingleTop = true
+        // Only show Users navigation item for admin users
+        val userProfile by authViewModel.userProfileState.collectAsState()
+        if (userProfile.role == "admin") {
+            NavigationDrawerItem(
+                icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Red) },
+                label = {
+                    Text(
+                        "Users",
+                        color = Color.Gray,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
+                selected = navController.currentDestination?.route == "users",
+                onClick = { 
+                    scope.launch {
+                        drawerState.close()
+                        navController.navigate("users") {
+                            launchSingleTop = true
+                        }
                     }
-                }
-            },
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .fillMaxWidth()
-        )
+                },
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
+            )
+        }
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Rounded.Article, contentDescription = null, tint = Color.Red) },
