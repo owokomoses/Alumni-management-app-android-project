@@ -410,7 +410,15 @@ fun DrawerContent(
             },
             modifier = Modifier
                 .padding(vertical = 4.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                unselectedContainerColor = Color.Transparent,
+                selectedIconColor = Color.Red,
+                unselectedIconColor = Color.Red,
+                selectedTextColor = Color.Gray,
+                unselectedTextColor = Color.Gray
+            )
         )
 
         // Only show Users navigation item for admin users
@@ -437,7 +445,15 @@ fun DrawerContent(
                 },
                 modifier = Modifier
                     .padding(vertical = 4.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                    unselectedContainerColor = Color.Transparent,
+                    selectedIconColor = Color.Red,
+                    unselectedIconColor = Color.Red,
+                    selectedTextColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
+                )
             )
         }
 
@@ -462,7 +478,15 @@ fun DrawerContent(
             },
             modifier = Modifier
                 .padding(vertical = 4.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                unselectedContainerColor = Color.Transparent,
+                selectedIconColor = Color.Red,
+                unselectedIconColor = Color.Red,
+                selectedTextColor = Color.Gray,
+                unselectedTextColor = Color.Gray
+            )
         )
 
         NavigationDrawerItem(
@@ -479,7 +503,15 @@ fun DrawerContent(
             onClick = { /* Navigate to messages */ },
             modifier = Modifier
                 .padding(vertical = 4.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                unselectedContainerColor = Color.Transparent,
+                selectedIconColor = Color.Red,
+                unselectedIconColor = Color.Red,
+                selectedTextColor = Color.Gray,
+                unselectedTextColor = Color.Gray
+            )
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -507,7 +539,15 @@ fun DrawerContent(
             },
             modifier = Modifier
                 .padding(vertical = 4.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = NavigationDrawerItemDefaults.colors(
+                selectedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                unselectedContainerColor = Color.Transparent,
+                selectedIconColor = Color.Red,
+                unselectedIconColor = Color.Red,
+                selectedTextColor = Color.Red,
+                unselectedTextColor = Color.Red
+            )
         )
     }
 }
