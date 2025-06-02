@@ -36,6 +36,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -549,5 +553,44 @@ fun DrawerContent(
                 unselectedTextColor = Color.Red
             )
         )
+    }
+}
+
+sealed class Screen(val route: String) {
+    object Welcome : Screen("welcome")
+    object Login : Screen("login")
+    object Register : Screen("register")
+    object Home : Screen("home")
+    object Profile : Screen("profile")
+    object Users : Screen("users")
+    object Posts : Screen("posts")
+    object JobPostDetail : Screen("job_post_detail/{postId}") {
+        fun createRoute(postId: String) = "job_post_detail/$postId"
+    }
+}
+
+@Composable
+fun AppNavigation(
+    navController: NavHostController = rememberNavController(),
+    authViewModel: AuthViewModel
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Login.route
+    ) {
+        composable(Screen.Login.route) { LoginScreen(navController, authViewModel) }
+        composable(Screen.Register.route) { RegisterScreen(navController, authViewModel) }
+        composable(Screen.Home.route) { HomeScreen(navController, authViewModel) }
+        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
+        composable(Screen.Users.route) { UsersScreen(navController, authViewModel) }
+        composable(Screen.Posts.route) { PostsScreen(navController, authViewModel) }
+        composable(Screen.JobPostDetail.route) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            JobPostDetail(
+                navController = navController,
+                postId = postId,
+                authViewModel = authViewModel
+            )
+        }
     }
 }

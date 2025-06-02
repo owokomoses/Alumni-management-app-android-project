@@ -79,6 +79,13 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             Posts(modifier, navController, authViewModel)
         }
 
+        composable("job_post_detail/{postId}") { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId")
+            if (postId != null) {
+                JobPostDetail(navController = navController, postId = postId, authViewModel = authViewModel)
+            }
+        }
+
         composable("profile") {
             ProfileScreen(navController = navController, authViewModel = authViewModel)
         }

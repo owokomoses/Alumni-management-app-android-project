@@ -144,7 +144,8 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                             selectedJobPost = post
                             showDeleteConfirmation = true
                         },
-                        currentUserEmail = currentUser?.email
+                        currentUserEmail = currentUser?.email,
+                        navController = navController
                     )
                 }
             }
@@ -265,7 +266,8 @@ fun JobPostCard(
     modifier: Modifier = Modifier,
     onEdit: (JobPost) -> Unit,
     onDelete: (JobPost) -> Unit,
-    currentUserEmail: String?
+    currentUserEmail: String?,
+    navController: NavController
 ) {
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
     
@@ -347,21 +349,7 @@ fun JobPostCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = jobPost.description,
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Requirements:",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Gray
-            )
-            Text(
-                text = jobPost.requirements.joinToString(", "),
+                text = jobPost.description.take(100) + if (jobPost.description.length > 100) "..." else "",
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -370,18 +358,22 @@ fun JobPostCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Salary: ${jobPost.salary}",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
-                Text(
-                    text = "Posted: ${dateFormat.format(jobPost.postedDate)}",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
+                Button(
+                    onClick = { navController.navigate("job_post_detail/${jobPost.id}") },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Text("View Post")
+                }
             }
 
             if (jobPost.deadline != null) {
@@ -392,6 +384,265 @@ fun JobPostCard(
                     color = Color.Red,
                     fontWeight = FontWeight.Medium
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun JobPostDetail(
+    navController: NavController,
+    postId: String,
+    authViewModel: AuthViewModel
+) {
+    var jobPost by remember { mutableStateOf<JobPost?>(null) }
+    val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+    val db = FirebaseFirestore.getInstance()
+
+    LaunchedEffect(postId) {
+        db.collection("jobPosts")
+            .document(postId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val data = document.data
+                    if (data != null) {
+                        jobPost = JobPost(
+                            id = document.id,
+                            title = data["title"] as? String ?: "",
+                            company = data["company"] as? String ?: "",
+                            location = data["location"] as? String ?: "",
+                            description = data["description"] as? String ?: "",
+                            requirements = (data["requirements"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                            salary = data["salary"] as? String ?: "",
+                            type = data["type"] as? String ?: "",
+                            postedBy = data["postedBy"] as? String ?: "",
+                            postedDate = DateConverter.toDate(data["postedDate"] as? com.google.firebase.Timestamp) ?: Date(),
+                            deadline = DateConverter.toDate(data["deadline"] as? com.google.firebase.Timestamp)
+                        )
+                    }
+                }
+            }
+    }
+
+    Screen(navController = navController, authViewModel = authViewModel) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(paddingValues)
+        ) {
+            // Header with back button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Red
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Job Details",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+            }
+
+            // Job Post Content
+            jobPost?.let { post ->
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFF5F5F5)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                // Title and Company
+                                Text(
+                                    text = post.title,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = post.company,
+                                    fontSize = 18.sp,
+                                    color = Color.Gray
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Location and Type
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.LocationOn,
+                                            contentDescription = "Location",
+                                            tint = Color.Gray,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = post.location,
+                                            fontSize = 16.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    Text(
+                                        text = post.type,
+                                        fontSize = 16.sp,
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Description
+                                Text(
+                                    text = "Description",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = post.description,
+                                    fontSize = 16.sp,
+                                    color = Color.Gray,
+                                    lineHeight = 24.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Requirements
+                                Text(
+                                    text = "Requirements",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                post.requirements.forEach { requirement ->
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Check,
+                                            contentDescription = null,
+                                            tint = Color.Red,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = requirement,
+                                            fontSize = 16.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Salary and Dates
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Salary",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                        Text(
+                                            text = post.salary,
+                                            fontSize = 16.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = "Posted",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                        Text(
+                                            text = dateFormat.format(post.postedDate),
+                                            fontSize = 16.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+
+                                if (post.deadline != null) {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Application Deadline",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                        Text(
+                                            text = dateFormat.format(post.deadline),
+                                            fontSize = 16.sp,
+                                            color = Color.Red,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                // Apply Button
+                                Button(
+                                    onClick = { /* Handle apply action */ },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Apply Now",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
