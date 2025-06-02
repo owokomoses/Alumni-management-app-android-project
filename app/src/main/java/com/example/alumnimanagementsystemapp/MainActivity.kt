@@ -401,11 +401,11 @@ fun DrawerContent(
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = navController.currentDestination?.route == "main",
+            selected = navController.currentDestination?.route == Screen.Home.route,
             onClick = {
                 scope.launch {
                     drawerState.close()
-                    navController.navigate("main") {
+                    navController.navigate(Screen.Home.route) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -438,11 +438,11 @@ fun DrawerContent(
                         fontWeight = FontWeight.Medium
                     )
                 },
-                selected = navController.currentDestination?.route == "users",
+                selected = navController.currentDestination?.route == Screen.Users.route,
                 onClick = { 
                     scope.launch {
                         drawerState.close()
-                        navController.navigate("users") {
+                        navController.navigate(Screen.Users.route) {
                             launchSingleTop = true
                         }
                     }
@@ -471,11 +471,11 @@ fun DrawerContent(
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = navController.currentDestination?.route == "posts",
+            selected = navController.currentDestination?.route == Screen.Posts.route,
             onClick = {
                 scope.launch {
                     drawerState.close()
-                    navController.navigate("posts") {
+                    navController.navigate(Screen.Posts.route) {
                         launchSingleTop = true
                     }
                 }
@@ -536,8 +536,8 @@ fun DrawerContent(
                 scope.launch {
                     drawerState.close()
                     authViewModel.signout()
-                    navController.navigate("welcome") {
-                        popUpTo("main") { inclusive = true }
+                    navController.navigate(Screen.Welcome.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
                     }
                 }
             },
@@ -566,31 +566,5 @@ sealed class Screen(val route: String) {
     object Posts : Screen("posts")
     object JobPostDetail : Screen("job_post_detail/{postId}") {
         fun createRoute(postId: String) = "job_post_detail/$postId"
-    }
-}
-
-@Composable
-fun AppNavigation(
-    navController: NavHostController = rememberNavController(),
-    authViewModel: AuthViewModel
-) {
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Login.route
-    ) {
-        composable(Screen.Login.route) { LoginScreen(navController, authViewModel) }
-        composable(Screen.Register.route) { RegisterScreen(navController, authViewModel) }
-        composable(Screen.Home.route) { HomeScreen(navController, authViewModel) }
-        composable(Screen.Profile.route) { ProfileScreen(navController, authViewModel) }
-        composable(Screen.Users.route) { UsersScreen(navController, authViewModel) }
-        composable(Screen.Posts.route) { PostsScreen(navController, authViewModel) }
-        composable(Screen.JobPostDetail.route) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            JobPostDetail(
-                navController = navController,
-                postId = postId,
-                authViewModel = authViewModel
-            )
-        }
     }
 }
