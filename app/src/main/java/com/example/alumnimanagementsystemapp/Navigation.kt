@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.alumnimanagementsystemapp.pages.ApplicationsPage
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
 import com.example.alumnimanagementsystemapp.pages.JobApplicationPage
 import com.example.alumnimanagementsystemapp.pages.JobPostDetail
@@ -93,6 +94,10 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             if (jobId != null) {
                 JobApplicationPage(navController = navController, jobId = jobId, authViewModel = authViewModel)
             }
+        }
+
+        composable(Screen.Applications.route) {
+            ApplicationsPage(navController = navController, authViewModel = authViewModel)
         }
 
         composable(Screen.Profile.route) {

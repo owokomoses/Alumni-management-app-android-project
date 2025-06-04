@@ -494,17 +494,24 @@ fun DrawerContent(
         )
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Rounded.Email, contentDescription = null, tint = Color.Red) },
+            icon = { Icon(Icons.Rounded.Assignment, contentDescription = null, tint = Color.Red) },
             label = {
                 Text(
-                    "Messages",
+                    "Applications",
                     color = Color.Gray,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium
                 )
             },
-            selected = navController.currentDestination?.route == "messages",
-            onClick = { /* Navigate to messages */ },
+            selected = navController.currentDestination?.route == Screen.Applications.route,
+            onClick = {
+                scope.launch {
+                    drawerState.close()
+                    navController.navigate(Screen.Applications.route) {
+                        launchSingleTop = true
+                    }
+                }
+            },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .fillMaxWidth(),
@@ -570,4 +577,5 @@ sealed class Screen(val route: String) {
     object JobApplication : Screen("job_application/{jobId}") {
         fun createRoute(jobId: String) = "job_application/$jobId"
     }
+    object Applications : Screen("applications")
 }
