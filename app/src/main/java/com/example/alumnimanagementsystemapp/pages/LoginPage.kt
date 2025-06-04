@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import com.example.alumnimanagementsystemapp.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -86,8 +87,8 @@ fun LoginPage(
                 val currentUser = Firebase.auth.currentUser
                 if (currentUser?.isEmailVerified == true) {
                     authViewModel.login(currentUser.email ?: "", "")
-                    navController.navigate("loginScreen") {
-                        popUpTo("login") { inclusive = true }
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
             }

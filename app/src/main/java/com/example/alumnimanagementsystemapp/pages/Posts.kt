@@ -225,10 +225,22 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                 showDeleteConfirmation = false
                 selectedJobPost = null
             },
-            title = { Text("Delete Post") },
-            text = { Text("Are you sure you want to delete this job post?") },
+            title = { 
+                Text(
+                    "Delete Post",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = { 
+                Text(
+                    "Are you sure you want to delete this job post?",
+                    color = Color.Gray
+                )
+            },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         // Use the document ID directly
                         db.collection("jobPosts")
@@ -241,9 +253,12 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                             .addOnFailureListener { e ->
                                 // Handle error
                             }
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
                 ) {
-                    Text("Delete", color = Color.Red)
+                    Text("Delete")
                 }
             },
             dismissButton = {
@@ -253,9 +268,12 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                         selectedJobPost = null
                     }
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", color = Color.Red)
                 }
-            }
+            },
+            containerColor = Color.White,
+            titleContentColor = Color.Red,
+            textContentColor = Color.Gray
         )
     }
 }
@@ -627,7 +645,7 @@ fun JobPostDetail(
 
                                 // Apply Button
                                 Button(
-                                    onClick = { /* Handle apply action */ },
+                                    onClick = { navController.navigate(Screen.JobApplication.createRoute(post.id)) },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Red
@@ -685,7 +703,14 @@ fun NewJobPostDialog(
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initialTitle.isEmpty()) "Create Job Post" else "Edit Job Post", color = Color.Red) },
+        title = { 
+            Text(
+                if (initialTitle.isEmpty()) "Create Job Post" else "Edit Job Post",
+                color = Color.Red,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column(
                 modifier = Modifier
@@ -697,21 +722,36 @@ fun NewJobPostDialog(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Job Title") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 OutlinedTextField(
                     value = company,
                     onValueChange = { company = it },
                     label = { Text("Company") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
                     label = { Text("Location") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 OutlinedTextField(
@@ -719,7 +759,12 @@ fun NewJobPostDialog(
                     onValueChange = { description = it },
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 3
+                    minLines = 3,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 OutlinedTextField(
@@ -727,14 +772,24 @@ fun NewJobPostDialog(
                     onValueChange = { requirements = it },
                     label = { Text("Requirements (comma-separated)") },
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 2
+                    minLines = 2,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 OutlinedTextField(
                     value = salary,
                     onValueChange = { salary = it },
                     label = { Text("Salary") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Red,
+                        focusedLabelColor = Color.Red,
+                        cursorColor = Color.Red
+                    )
                 )
                 
                 ExposedDropdownMenuBox(
@@ -749,7 +804,12 @@ fun NewJobPostDialog(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor()
+                            .menuAnchor(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Red,
+                            focusedLabelColor = Color.Red,
+                            cursorColor = Color.Red
+                        )
                     )
                     
                     ExposedDropdownMenu(
@@ -788,6 +848,9 @@ fun NewJobPostDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cancel", color = Color.Red)
             }
-        }
+        },
+        containerColor = Color.White,
+        titleContentColor = Color.Red,
+        textContentColor = Color.Gray
     )
 } 

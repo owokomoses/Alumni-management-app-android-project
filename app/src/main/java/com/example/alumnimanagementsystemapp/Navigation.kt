@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
+import com.example.alumnimanagementsystemapp.pages.JobApplicationPage
 import com.example.alumnimanagementsystemapp.pages.JobPostDetail
 import com.example.alumnimanagementsystemapp.pages.LoginPage
 import com.example.alumnimanagementsystemapp.pages.NotificationPage
@@ -54,8 +55,16 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             LoginPage(modifier, navController, authViewModel)
         }
 
+        composable("loginScreen") {
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
+
         composable(Screen.Register.route) {
             SignupPage(modifier, navController, authViewModel)
+        }
+
+        composable("signupScreen") {
+            SignupScreen(navController = navController, authViewModel = authViewModel)
         }
 
         composable(Screen.Home.route) {
@@ -76,6 +85,13 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             val postId = backStackEntry.arguments?.getString("postId")
             if (postId != null) {
                 JobPostDetail(navController = navController, postId = postId, authViewModel = authViewModel)
+            }
+        }
+
+        composable(Screen.JobApplication.route) { backStackEntry ->
+            val jobId = backStackEntry.arguments?.getString("jobId")
+            if (jobId != null) {
+                JobApplicationPage(navController = navController, jobId = jobId, authViewModel = authViewModel)
             }
         }
 
@@ -115,6 +131,7 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             is AuthState.Unauthenticated -> {
                 // Only navigate to login if we're not already there and not on welcome screen
                 if (navController.currentDestination?.route != Screen.Login.route && 
+                    navController.currentDestination?.route != "loginScreen" &&
                     navController.currentDestination?.route != Screen.Welcome.route) {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(navController.graph.startDestinationId) {

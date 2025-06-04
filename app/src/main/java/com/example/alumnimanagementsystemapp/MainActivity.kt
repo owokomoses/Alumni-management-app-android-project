@@ -567,4 +567,7 @@ sealed class Screen(val route: String) {
     object JobPostDetail : Screen("job_post_detail/{postId}") {
         fun createRoute(postId: String) = "job_post_detail/$postId"
     }
+    object JobApplication : Screen("job_application/{jobId}") {
+        fun createRoute(jobId: String) = "job_application/$jobId"
+    }
 }
