@@ -297,6 +297,19 @@ fun TopBar(
                 )
             },
             actions = {
+                // Notification Icon
+                Icon(
+                    imageVector = Icons.Rounded.Notifications,
+                    contentDescription = "Notifications",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .clickable {
+                            // TODO: Handle notification click
+                        }
+                        .padding(end = 8.dp)
+                        .size(28.dp)
+                )
+                
                 // Profile Icon/Image
                 val userProfile by authViewModel.userProfileState.collectAsState()
                 val currentUser = authViewModel.currentUser
