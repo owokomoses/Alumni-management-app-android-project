@@ -30,6 +30,7 @@ fun ApplicationsPage(
 ) {
     var applications by remember { mutableStateOf<List<JobApplication>>(emptyList()) }
     var showStatusDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedApplication by remember { mutableStateOf<JobApplication?>(null) }
     var selectedStatus by remember { mutableStateOf("") }
     val db = FirebaseFirestore.getInstance()
@@ -171,34 +172,57 @@ fun ApplicationsPage(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Action Buttons
-                            if (application.status == "Pending") {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                // Delete Button
+                                Button(
+                                    onClick = {
+                                        selectedApplication = application
+                                        showDeleteDialog = true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red
+                                    )
                                 ) {
-                                    Button(
-                                        onClick = {
-                                            selectedApplication = application
-                                            selectedStatus = "Accepted"
-                                            showStatusDialog = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.Green
-                                        )
-                                    ) {
-                                        Text("Accept")
-                                    }
-                                    Button(
-                                        onClick = {
-                                            selectedApplication = application
-                                            selectedStatus = "Declined"
-                                            showStatusDialog = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.Red
-                                        )
-                                    ) {
-                                        Text("Decline")
+                                    Icon(
+                                        imageVector = Icons.Rounded.Delete,
+                                        contentDescription = "Delete",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Delete")
+                                }
+
+                                // Status Update Buttons
+                                if (application.status == "Pending") {
+                                    Row {
+                                        Button(
+                                            onClick = {
+                                                selectedApplication = application
+                                                selectedStatus = "Accepted"
+                                                showStatusDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Green
+                                            )
+                                        ) {
+                                            Text("Accept")
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(
+                                            onClick = {
+                                                selectedApplication = application
+                                                selectedStatus = "Declined"
+                                                showStatusDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Red
+                                            )
+                                        ) {
+                                            Text("Decline")
+                                        }
                                     }
                                 }
                             }
@@ -254,6 +278,63 @@ fun ApplicationsPage(
                 TextButton(
                     onClick = {
                         showStatusDialog = false
+                        selectedApplication = null
+                    }
+                ) {
+                    Text("Cancel", color = Color.Red)
+                }
+            },
+            containerColor = Color.White,
+            titleContentColor = Color.Red,
+            textContentColor = Color.Gray
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (showDeleteDialog && selectedApplication != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+                selectedApplication = null
+            },
+            title = {
+                Text(
+                    "Delete Application",
+                    color = Color.Red,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    "Are you sure you want to delete this application?",
+                    color = Color.Gray
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        selectedApplication?.let { application ->
+                            db.collection("jobApplications")
+                                .document(application.id)
+                                .delete()
+                                .addOnSuccessListener {
+                                    showDeleteDialog = false
+                                    selectedApplication = null
+                                }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
                         selectedApplication = null
                     }
                 ) {
