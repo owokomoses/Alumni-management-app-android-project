@@ -726,7 +726,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -738,7 +740,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -750,7 +754,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -763,7 +769,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -776,7 +784,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -788,7 +798,9 @@ fun NewJobPostDialog(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         focusedLabelColor = Color.Red,
-                        cursorColor = Color.Red
+                        cursorColor = Color.Red,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 
@@ -808,7 +820,9 @@ fun NewJobPostDialog(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Red,
                             focusedLabelColor = Color.Red,
-                            cursorColor = Color.Red
+                            cursorColor = Color.Red,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
                         )
                     )
                     

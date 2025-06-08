@@ -109,7 +109,9 @@ fun JobApplicationPage(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Red,
                             focusedLabelColor = Color.Red,
-                            cursorColor = Color.Red
+                            cursorColor = Color.Red,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
                         ),
                         placeholder = { Text("Write your cover letter here...") }
                     )
@@ -131,7 +133,9 @@ fun JobApplicationPage(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.Red,
                             focusedLabelColor = Color.Red,
-                            cursorColor = Color.Red
+                            cursorColor = Color.Red,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
                         ),
                         placeholder = { Text("Enter your resume URL (e.g., LinkedIn profile)") }
                     )

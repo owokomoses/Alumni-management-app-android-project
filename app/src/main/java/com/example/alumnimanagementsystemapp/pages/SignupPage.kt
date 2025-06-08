@@ -117,12 +117,14 @@ fun SignupPage(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
                     unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.Red
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
-                textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -136,7 +138,9 @@ fun SignupPage(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
                     unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.Red
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,7 +148,7 @@ fun SignupPage(
                     .onFocusChanged { focusState ->
                         emailIsFocused = focusState.isFocused
                     },
-                textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -168,7 +172,9 @@ fun SignupPage(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
                     unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.Red
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,7 +182,7 @@ fun SignupPage(
                     .onFocusChanged { focusState ->
                         emailIsFocused = focusState.isFocused
                     },
-                textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -200,7 +206,9 @@ fun SignupPage(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
                     unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.Red
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,7 +216,7 @@ fun SignupPage(
                     .onFocusChanged { focusState ->
                         emailIsFocused = focusState.isFocused
                     },
-                textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 

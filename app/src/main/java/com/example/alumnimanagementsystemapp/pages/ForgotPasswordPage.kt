@@ -116,7 +116,9 @@ fun ForgotPasswordPage(
                     focusedBorderColor = Color.Red,
                     unfocusedBorderColor = Color.Gray,
                     focusedLabelColor = Color.Red,
-                    unfocusedLabelColor = Color.Gray
+                    unfocusedLabelColor = Color.Gray,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,

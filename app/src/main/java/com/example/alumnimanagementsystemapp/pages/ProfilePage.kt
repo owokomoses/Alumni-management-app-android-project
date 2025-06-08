@@ -33,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -259,20 +260,34 @@ fun EditBottomSheet(
                         imageVector = Icons.Rounded.Person,
                         contentDescription = "Name Icon"
                     )
-                }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Red,
+                    focusedLabelColor = Color.Red,
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = newEmail, // Add email input field
+                value = newEmail,
                 onValueChange = { newEmail = it },
                 label = { Text("Email") },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Rounded.Email, // Use an appropriate icon for email
+                        imageVector = Icons.Rounded.Email,
                         contentDescription = "Email Icon"
                     )
-                }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Red,
+                    focusedLabelColor = Color.Red,
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -285,7 +300,14 @@ fun EditBottomSheet(
                         imageVector = Icons.Rounded.Info,
                         contentDescription = "About Icon"
                     )
-                }
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Red,
+                    focusedLabelColor = Color.Red,
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
