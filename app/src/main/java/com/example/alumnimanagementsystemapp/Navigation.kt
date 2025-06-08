@@ -12,7 +12,7 @@ import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
 import com.example.alumnimanagementsystemapp.pages.JobApplicationPage
 import com.example.alumnimanagementsystemapp.pages.JobPostDetail
 import com.example.alumnimanagementsystemapp.pages.LoginPage
-import com.example.alumnimanagementsystemapp.pages.NotificationPage
+import com.example.alumnimanagementsystemapp.pages.NotificationsPage
 import com.example.alumnimanagementsystemapp.pages.Posts
 import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.pages.Users
@@ -102,6 +102,10 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable(Screen.Profile.route) {
             ProfileScreen(navController = navController, authViewModel = authViewModel)
+        }
+
+        composable(Screen.Notifications.route) {
+            NotificationsPage(navController = navController, authViewModel = authViewModel)
         }
 
         composable("verificationPage") {

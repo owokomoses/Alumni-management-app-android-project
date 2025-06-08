@@ -304,7 +304,9 @@ fun TopBar(
                     tint = Color.Red,
                     modifier = Modifier
                         .clickable {
-                            // TODO: Handle notification click
+                            navController.navigate(Screen.Notifications.route) {
+                                launchSingleTop = true
+                            }
                         }
                         .padding(end = 8.dp)
                         .size(28.dp)
@@ -584,6 +586,7 @@ sealed class Screen(val route: String) {
     object Profile : Screen("profile")
     object Users : Screen("users")
     object Posts : Screen("posts")
+    object Notifications : Screen("notifications")
     object JobPostDetail : Screen("job_post_detail/{postId}") {
         fun createRoute(postId: String) = "job_post_detail/$postId"
     }
