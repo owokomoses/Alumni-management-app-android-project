@@ -176,6 +176,18 @@ fun ApplicationsPage(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                // View Application Button
+                                Button(
+                                    onClick = {
+                                        navController.navigate("view_application/${application.id}")
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red
+                                    )
+                                ) {
+                                    Text("View Application")
+                                }
+
                                 // Delete Button
                                 Button(
                                     onClick = {

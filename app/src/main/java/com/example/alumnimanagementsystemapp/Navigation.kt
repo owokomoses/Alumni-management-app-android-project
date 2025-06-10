@@ -17,6 +17,7 @@ import com.example.alumnimanagementsystemapp.pages.Posts
 import com.example.alumnimanagementsystemapp.pages.SignupPage
 import com.example.alumnimanagementsystemapp.pages.Users
 import com.example.alumnimanagementsystemapp.pages.VerificationPage
+import com.example.alumnimanagementsystemapp.pages.ViewApplicationPage
 import com.example.alumnimanagementsystemapp.screens.LoginScreen
 import com.example.alumnimanagementsystemapp.screens.ProfileScreen
 import com.example.alumnimanagementsystemapp.screens.SignupScreen
@@ -121,6 +122,13 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
 
         composable("forgotPasswordPage") {
             ForgotPasswordPage(modifier, navController, authViewModel)
+        }
+
+        composable(Screen.ViewApplication.route) { backStackEntry ->
+            val applicationId = backStackEntry.arguments?.getString("applicationId")
+            if (applicationId != null) {
+                ViewApplicationPage(navController = navController, applicationId = applicationId, authViewModel = authViewModel)
+            }
         }
     }
 

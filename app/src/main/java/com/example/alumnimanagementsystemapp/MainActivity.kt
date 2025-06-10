@@ -596,5 +596,8 @@ sealed class Screen(val route: String) {
     object JobApplication : Screen("job_application/{jobId}") {
         fun createRoute(jobId: String) = "job_application/$jobId"
     }
+    object ViewApplication : Screen("view_application/{applicationId}") {
+        fun createRoute(applicationId: String) = "view_application/$applicationId"
+    }
     object Applications : Screen("applications")
 }
