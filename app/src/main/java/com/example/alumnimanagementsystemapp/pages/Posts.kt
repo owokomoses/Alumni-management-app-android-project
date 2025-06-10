@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.Screen
-import com.example.alumnimanagementsystemapp.utils.DateConverter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -44,6 +43,19 @@ data class JobPost(
     val postedDate: Date = Date(),
     val deadline: Date? = null
 )
+
+// Custom converter for Date type
+class DateConverter {
+    companion object {
+        fun toDate(timestamp: com.google.firebase.Timestamp?): Date? {
+            return timestamp?.toDate()
+        }
+
+        fun toTimestamp(date: Date?): com.google.firebase.Timestamp? {
+            return date?.let { com.google.firebase.Timestamp(it) }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

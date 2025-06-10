@@ -4,14 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,11 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.Screen
-import com.example.alumnimanagementsystemapp.models.JobApplication
-import com.example.alumnimanagementsystemapp.utils.DateConverter
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,7 +31,6 @@ fun ApplicationsPage(
     var applications by remember { mutableStateOf<List<JobApplication>>(emptyList()) }
     var showStatusDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var showViewDialog by remember { mutableStateOf(false) }
     var selectedApplication by remember { mutableStateOf<JobApplication?>(null) }
     var selectedStatus by remember { mutableStateOf("") }
     val db = FirebaseFirestore.getInstance()
@@ -183,20 +174,25 @@ fun ApplicationsPage(
                             // Action Buttons
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // View Button
+                                // Delete Button
                                 Button(
                                     onClick = {
                                         selectedApplication = application
-                                        showViewDialog = true
+                                        showDeleteDialog = true
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Red
                                     )
                                 ) {
-                                    Text("View Details")
+                                    Icon(
+                                        imageVector = Icons.Rounded.Delete,
+                                        contentDescription = "Delete",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Delete")
                                 }
 
                                 // Status Update Buttons
@@ -235,110 +231,6 @@ fun ApplicationsPage(
                 }
             }
         }
-    }
-
-    // View Application Dialog
-    if (showViewDialog && selectedApplication != null) {
-        AlertDialog(
-            onDismissRequest = {
-                showViewDialog = false
-                selectedApplication = null
-            },
-            title = {
-                Text(
-                    "Application Details",
-                    color = Color.Red,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    // Applicant Info
-                    Text(
-                        text = "Applicant Information",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
-                    Text(
-                        text = "Name: ${selectedApplication?.applicantName}",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Email: ${selectedApplication?.applicantEmail}",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Applied Date: ${dateFormat.format(selectedApplication?.appliedDate)}",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "Status: ${selectedApplication?.status}",
-                        fontSize = 16.sp,
-                        color = when (selectedApplication?.status) {
-                            "Accepted" -> Color.Green
-                            "Declined" -> Color.Red
-                            else -> Color.Gray
-                        },
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Cover Letter
-                    Text(
-                        text = "Cover Letter",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
-                    Text(
-                        text = selectedApplication?.coverLetter ?: "",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Resume
-                    Text(
-                        text = "Resume",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
-                    )
-                    Text(
-                        text = selectedApplication?.resumeUrl ?: "",
-                        fontSize = 16.sp,
-                        color = Color.Blue
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showViewDialog = false
-                        selectedApplication = null
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    )
-                ) {
-                    Text("Close")
-                }
-            },
-            containerColor = Color.White,
-            titleContentColor = Color.Red,
-            textContentColor = Color.Gray
-        )
     }
 
     // Status Update Dialog
