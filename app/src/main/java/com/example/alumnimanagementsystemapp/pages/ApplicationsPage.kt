@@ -101,18 +101,40 @@ fun ApplicationsPage(
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            // Applicant Info
-                            Text(
-                                text = application.applicantName,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                            Text(
-                                text = application.applicantEmail,
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
+                            // Header with applicant info and delete button
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = application.applicantName,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Red
+                                    )
+                                    Text(
+                                        text = application.applicantEmail,
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
+                                }
+
+                                // Delete Icon Button
+                                IconButton(
+                                    onClick = {
+                                        selectedApplication = application
+                                        showDeleteDialog = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Delete,
+                                        contentDescription = "Delete",
+                                        tint = Color.Red
+                                    )
+                                }
+                            }
 
                             Spacer(modifier = Modifier.height(8.dp))
 
@@ -186,25 +208,6 @@ fun ApplicationsPage(
                                     )
                                 ) {
                                     Text("View Application")
-                                }
-
-                                // Delete Button
-                                Button(
-                                    onClick = {
-                                        selectedApplication = application
-                                        showDeleteDialog = true
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Red
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Delete,
-                                        contentDescription = "Delete",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Delete")
                                 }
 
                                 // Status Update Buttons

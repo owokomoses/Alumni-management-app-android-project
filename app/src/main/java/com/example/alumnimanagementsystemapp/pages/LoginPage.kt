@@ -249,7 +249,7 @@ fun LoginPage(
                     fontSize = 16.sp
                 )
                 TextButton(
-                    onClick = { navController.navigate("signup") },
+                    onClick = { navController.navigate(Screen.Register.route) },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
                     Text(
