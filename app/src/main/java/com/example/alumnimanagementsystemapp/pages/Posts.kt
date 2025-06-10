@@ -62,7 +62,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
             .orderBy("postedDate", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
-                
+
                 if (snapshot != null) {
                     jobPosts = snapshot.documents.mapNotNull { doc ->
                         try {
@@ -109,7 +109,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                     fontWeight = FontWeight.Bold,
                     color = Color.Red
                 )
-                
+
                 FloatingActionButton(
                     onClick = { showNewPostDialog = true },
                     containerColor = Color.Red,
@@ -161,7 +161,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                     "postedDate" to DateConverter.toTimestamp(Date()),
                     "deadline" to DateConverter.toTimestamp(deadline)
                 )
-                
+
                 db.collection("jobPosts").add(newPost)
                 showNewPostDialog = false
             }
@@ -171,7 +171,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
     // Edit Post Dialog
     if (showEditPostDialog && selectedJobPost != null) {
         NewJobPostDialog(
-            onDismiss = { 
+            onDismiss = {
                 showEditPostDialog = false
                 selectedJobPost = null
             },
@@ -217,7 +217,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                 showDeleteConfirmation = false
                 selectedJobPost = null
             },
-            title = { 
+            title = {
                 Text(
                     "Delete Post",
                     color = Color.Red,
@@ -225,7 +225,7 @@ fun Posts(modifier: Modifier, navController: NavController, authViewModel: AuthV
                     fontWeight = FontWeight.Bold
                 )
             },
-            text = { 
+            text = {
                 Text(
                     "Are you sure you want to delete this job post?",
                     color = Color.Gray
@@ -280,7 +280,7 @@ fun JobPostCard(
     navController: NavController
 ) {
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -307,7 +307,7 @@ fun JobPostCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.Red
                 )
-                
+
                 // Only show edit/delete buttons if the current user is the post creator
                 if (currentUserEmail == jobPost.postedBy) {
                     Row {
@@ -690,13 +690,13 @@ fun NewJobPostDialog(
     var type by remember { mutableStateOf(initialType) }
     var deadline by remember { mutableStateOf(initialDeadline) }
     var expanded by remember { mutableStateOf(false) }
-    
+
     val jobTypes = listOf("Full-time", "Part-time", "Contract", "Internship", "Remote")
     val scrollState = rememberScrollState()
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { 
+        title = {
             Text(
                 if (initialTitle.isEmpty()) "Create Job Post" else "Edit Job Post",
                 color = Color.Red,
@@ -725,7 +725,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 OutlinedTextField(
                     value = company,
                     onValueChange = { company = it },
@@ -739,7 +739,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
@@ -753,7 +753,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
@@ -768,7 +768,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 OutlinedTextField(
                     value = requirements,
                     onValueChange = { requirements = it },
@@ -783,7 +783,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 OutlinedTextField(
                     value = salary,
                     onValueChange = { salary = it },
@@ -797,7 +797,7 @@ fun NewJobPostDialog(
                         unfocusedTextColor = Color.Black
                     )
                 )
-                
+
                 // Job Type Dropdown
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -820,7 +820,7 @@ fun NewJobPostDialog(
                             unfocusedTextColor = Color.Black
                         )
                     )
-                    
+
                     ExposedDropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
@@ -841,7 +841,7 @@ fun NewJobPostDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (title.isNotBlank() && company.isNotBlank() && location.isNotBlank() && 
+                    if (title.isNotBlank() && company.isNotBlank() && location.isNotBlank() &&
                         description.isNotBlank() && requirements.isNotBlank() && salary.isNotBlank()) {
                         onPost(title, company, location, description, requirements, salary, type, deadline)
                     }
@@ -862,4 +862,4 @@ fun NewJobPostDialog(
         titleContentColor = Color.Red,
         textContentColor = Color.Gray
     )
-} 
+}
