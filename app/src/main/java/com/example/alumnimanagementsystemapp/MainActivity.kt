@@ -395,7 +395,7 @@ fun DrawerContent(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "IST Alumni Network",
+                    text = "IST Alumni App",
                     color = Color.Red,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -600,4 +600,5 @@ sealed class Screen(val route: String) {
         fun createRoute(applicationId: String) = "view_application/$applicationId"
     }
     object Applications : Screen("applications")
+    object Verification : Screen("verificationPage")
 }

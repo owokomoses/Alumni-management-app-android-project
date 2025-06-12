@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import com.example.alumnimanagementsystemapp.Screen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -56,8 +57,8 @@ fun SignupPage(
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.VerificationEmailSent -> {
-                navController.navigate("signupScreen") {
-                    popUpTo("signup") { inclusive = true }
+                navController.navigate("verificationPage") {
+                    popUpTo(Screen.Register.route) { inclusive = true }
                 }
             }
             is AuthState.Error -> {
@@ -112,115 +113,92 @@ fun SignupPage(
             OutlinedTextField(
                 value = displayName,
                 onValueChange = { displayName = it },
-                label = { Text(text = "Full Name", color = if (emailIsFocused) Color.Red else Color.Gray) },
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                label = { Text("Full Name") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color.Red,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Email Address", color = if (emailIsFocused) Color.Red else Color.Gray) },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                label = { Text("Email") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color.Red,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        emailIsFocused = focusState.isFocused
-                    },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(text = "Password", color = if (emailIsFocused) Color.Red else Color.Gray) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                label = { Text("Password") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = Color.Red
+                            tint = Color.Gray
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color.Red,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        emailIsFocused = focusState.isFocused
-                    },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text(text = "Confirm Password", color = if (emailIsFocused) Color.Red else Color.Gray) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                label = { Text("Confirm Password") },
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(
-                            imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                            tint = Color.Red
+                            tint = Color.Gray
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = Color.Gray,
+                    focusedLabelColor = Color.Red,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        emailIsFocused = focusState.isFocused
-                    },
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Sign Up Button
             Button(
@@ -260,7 +238,7 @@ fun SignupPage(
                     fontSize = 16.sp
                 )
                 TextButton(
-                    onClick = { navController.navigate("login") },
+                    onClick = { navController.navigate(Screen.Login.route) },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
                     Text(
