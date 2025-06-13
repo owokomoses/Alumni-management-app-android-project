@@ -107,7 +107,7 @@ fun SignupPage(
             )
 
             Text(
-                text = "Join our alumni community",
+                text = "Sign up to get started",
                 fontSize = 16.sp,
                 color = Color.Gray,
                 modifier = Modifier.padding(top = 8.dp)
@@ -115,92 +115,121 @@ fun SignupPage(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Form Fields
+            // Display Name Field
             OutlinedTextField(
                 value = displayName,
                 onValueChange = { displayName = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                label = { Text("Full Name") },
+                label = { Text(text = "Full Name", color = if (emailIsFocused) Color.Red else Color.Gray) },
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    focusedLabelColor = Color.Red,
+                    unfocusedBorderColor = Color.Gray,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        emailIsFocused = focusState.isFocused
+                    },
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Email Field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                label = { Text("Email") },
+                label = { Text(text = "Email Address", color = if (emailIsFocused) Color.Red else Color.Gray) },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    focusedLabelColor = Color.Red,
+                    unfocusedBorderColor = Color.Gray,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        emailIsFocused = focusState.isFocused
+                    },
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Password Field
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                label = { Text("Password") },
+                label = { Text(text = "Password", color = if (emailIsFocused) Color.Red else Color.Gray) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = Color.Gray
+                            tint = Color.Red
                         )
                     }
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    focusedLabelColor = Color.Red,
+                    unfocusedBorderColor = Color.Gray,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        emailIsFocused = focusState.isFocused
+                    },
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Confirm Password Field
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                label = { Text("Confirm Password") },
+                label = { Text(text = "Confirm Password", color = if (emailIsFocused) Color.Red else Color.Gray) },
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(
-                            imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                             contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                            tint = Color.Gray
+                            tint = Color.Red
                         )
                     }
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Red,
-                    focusedLabelColor = Color.Red,
+                    unfocusedBorderColor = Color.Gray,
                     cursorColor = Color.Red,
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        emailIsFocused = focusState.isFocused
+                    },
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -232,18 +261,18 @@ fun SignupPage(
                         color = Color.White
                     )
                 } else {
-                Text(
-                    text = "Create Account",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                    Text(
+                        text = "Create Account",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Login Link
+            // Sign In Link
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -259,9 +288,9 @@ fun SignupPage(
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
                     Text(
-                        text = "Login",
+                        text = "Sign In",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
