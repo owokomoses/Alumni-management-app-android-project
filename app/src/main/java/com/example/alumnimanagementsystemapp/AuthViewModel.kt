@@ -111,10 +111,10 @@ class AuthViewModel : ViewModel() {
 
     fun signup(email: String, password: String, displayName: String) {
         if (email.isEmpty() || password.isEmpty()) {
-            _authState.value = AuthState.Error("Email or password can't be empty")
+            _authState.postValue(AuthState.Error("Email or password can't be empty"))
             return
         }
-        _authState.value = AuthState.Loading
+        _authState.postValue(AuthState.Loading)
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -133,18 +133,26 @@ class AuthViewModel : ViewModel() {
                                 user?.sendEmailVerification()
                                     ?.addOnCompleteListener { verificationTask ->
                                         if (verificationTask.isSuccessful) {
-                                            _authState.value = AuthState.VerificationEmailSent
+                                            Log.d("AuthViewModel", "Verification email sent successfully")
+                                            // Sign out before setting verification state
+                                            auth.signOut()
+                                            // Set verification state after signout
+                                            _authState.postValue(AuthState.VerificationEmailSent)
                                         } else {
-                                            _authState.value = AuthState.Error("Failed to send verification email")
+                                            Log.e("AuthViewModel", "Failed to send verification email: ${verificationTask.exception}")
+                                            _authState.postValue(AuthState.Error("Failed to send verification email"))
                                         }
                                     }
                             } else {
-                                _authState.value = AuthState.Error("Failed to update display name")
+                                Log.e("AuthViewModel", "Failed to update display name: ${profileUpdateTask.exception}")
+                                _authState.postValue(AuthState.Error("Failed to update display name"))
                             }
                         }
                 } else {
-                    _authState.value =
+                    Log.e("AuthViewModel", "Signup failed: ${task.exception}")
+                    _authState.postValue(
                         AuthState.Error(task.exception?.message ?: "Something went wrong")
+                    )
                 }
             }
     }
@@ -356,7 +364,8 @@ class AuthViewModel : ViewModel() {
         _userProfileState.value = UserProfile()
         // Then sign out
         auth.signOut()
-        _authState.value = AuthState.Unauthenticated
+        // Don't set Unauthenticated state here to prevent automatic navigation
+        // _authState.value = AuthState.Unauthenticated
     }
 }
 

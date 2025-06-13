@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthState
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.R
+import com.example.alumnimanagementsystemapp.Screen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -29,41 +30,22 @@ import kotlinx.coroutines.delay
 fun VerificationPage(
     modifier: Modifier = Modifier,
     navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    email: String = ""
 ) {
-    var isResending by remember { mutableStateOf(false) }
+    var isProcessing by remember { mutableStateOf(false) }
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
-
-    // Check verification status periodically
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(2000) // Check every 2 seconds
-            auth.currentUser?.reload()?.addOnSuccessListener {
-                if (auth.currentUser?.isEmailVerified == true) {
-                    // Email is verified, navigate to login screen
-                    navController.navigate("loginScreen") {
-                        popUpTo("verificationPage") { inclusive = true }
-                    }
-                }
-            }
-        }
-    }
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.VerificationEmailSent -> {
-                Toast.makeText(
-                    context,
-                    "Verification email sent. Please check your inbox.",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(context, "Verification email sent successfully!", Toast.LENGTH_SHORT).show()
+                isProcessing = false
             }
             is AuthState.Error -> {
-                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT)
-                    .show()
-                isResending = false
+                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                isProcessing = false
             }
             else -> Unit
         }
@@ -78,10 +60,11 @@ fun VerificationPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Logo
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Logo and Title Section
             Image(
                 painter = painterResource(id = R.drawable.icon),
                 contentDescription = "App Logo",
@@ -90,9 +73,8 @@ fun VerificationPage(
                     .clip(RoundedCornerShape(16.dp))
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Title
             Text(
                 text = "Verify Your Email",
                 fontSize = 28.sp,
@@ -100,41 +82,58 @@ fun VerificationPage(
                 color = Color.Red
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Instructions
             Text(
-                text = "We've sent a verification email to your inbox. Please check your email and click the verification link to activate your account.",
+                text = "We've sent a verification link to your email",
                 fontSize = 16.sp,
                 color = Color.Gray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Resend Button
+            // Email Display
+            OutlinedTextField(
+                value = email,
+                onValueChange = { },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                label = { Text("Your Email") },
+                enabled = false,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Red,
+                    focusedLabelColor = Color.Red,
+                    cursorColor = Color.Red,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Resend Verification Button
             Button(
                 onClick = {
-                    isResending = true
+                    isProcessing = true
                     authViewModel.sendVerificationEmail()
                 },
-                enabled = !isResending,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                enabled = !isProcessing
             ) {
-                if (isResending) {
+                if (isProcessing) {
                     CircularProgressIndicator(
-                        color = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
                     )
                 } else {
                     Text(
                         text = "Resend Verification Email",
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -143,15 +142,15 @@ fun VerificationPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Login Link
+            // Back to Login Button
             TextButton(
-                onClick = { navController.navigate("login") },
+                onClick = { navController.navigate(Screen.Login.route) },
                 colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
             ) {
                 Text(
                     text = "Back to Login",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

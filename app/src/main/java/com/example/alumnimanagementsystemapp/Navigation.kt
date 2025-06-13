@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.alumnimanagementsystemapp.pages.ApplicationsPage
 import com.example.alumnimanagementsystemapp.pages.ForgotPasswordPage
 import com.example.alumnimanagementsystemapp.pages.JobApplicationPage
@@ -65,8 +67,12 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             SignupPage(modifier, navController, authViewModel)
         }
 
-        composable("signupScreen") {
-            SignupScreen(navController = navController, authViewModel = authViewModel)
+        composable(
+            route = "verificationPage/{email}",
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            VerificationPage(modifier, navController, authViewModel, email)
         }
 
         composable(Screen.Home.route) {
@@ -116,10 +122,6 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             NotificationsPage(navController = navController, authViewModel = authViewModel)
         }
 
-        composable("verificationPage") {
-            VerificationPage(modifier, navController, authViewModel)
-        }
-
         composable("forgotPasswordPage") {
             ForgotPasswordPage(modifier, navController, authViewModel)
         }
@@ -139,24 +141,23 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                 // If we're not already on the main screen, navigate there
                 if (navController.currentDestination?.route != Screen.Home.route) {
                     navController.navigate(Screen.Home.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 }
             }
             is AuthState.Unauthenticated -> {
                 // Only navigate to login if we're not already there and not on welcome screen
-                if (navController.currentDestination?.route != Screen.Login.route && 
-                    navController.currentDestination?.route != "loginScreen" &&
-                    navController.currentDestination?.route != Screen.Welcome.route) {
+                // and not on verification page
+                val currentRoute = navController.currentDestination?.route
+                if (currentRoute != Screen.Login.route && 
+                    currentRoute != "loginScreen" &&
+                    currentRoute != Screen.Welcome.route &&
+                    currentRoute != "verificationPage/{email}" &&
+                    currentRoute != Screen.Register.route) {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
@@ -165,6 +166,9 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
                         restoreState = true
                     }
                 }
+            }
+            is AuthState.VerificationEmailSent -> {
+                // Don't do anything here, let the SignupPage handle the navigation
             }
             else -> {
                 // Handle other states if needed

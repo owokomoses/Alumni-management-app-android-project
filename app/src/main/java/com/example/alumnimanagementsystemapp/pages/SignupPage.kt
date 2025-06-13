@@ -57,7 +57,8 @@ fun SignupPage(
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.VerificationEmailSent -> {
-                navController.navigate("verificationPage") {
+                // Navigate to verification page with email
+                navController.navigate("verificationPage/${email}") {
                     popUpTo(Screen.Register.route) { inclusive = true }
                 }
             }
@@ -65,7 +66,12 @@ fun SignupPage(
                 Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
                 isProcessing = false
             }
-            else -> Unit
+            is AuthState.Loading -> {
+                isProcessing = true
+            }
+            else -> {
+                isProcessing = false
+            }
         }
     }
 
@@ -205,6 +211,9 @@ fun SignupPage(
                 onClick = {
                     if (password == confirmPassword) {
                         isProcessing = true
+                        // Clear any previous auth state
+                        authViewModel.signout()
+                        // Then proceed with signup
                         authViewModel.signup(email, password, displayName)
                     } else {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
@@ -214,14 +223,22 @@ fun SignupPage(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                enabled = !isProcessing
             ) {
-                Text(
-                    text = "Create Account",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                if (isProcessing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Text(
+                        text = "Create Account",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
