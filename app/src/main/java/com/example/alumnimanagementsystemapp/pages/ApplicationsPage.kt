@@ -108,17 +108,17 @@ fun ApplicationsPage(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                                    Text(
-                                        text = application.applicantName,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Red
-                                    )
-                                    Text(
-                                        text = application.applicantEmail,
-                                        fontSize = 14.sp,
-                                        color = Color.Gray
-                                    )
+                            Text(
+                                text = application.applicantName,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red
+                            )
+                            Text(
+                                text = application.applicantEmail,
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
                                 }
 
                                 // Delete Icon Button
@@ -194,10 +194,10 @@ fun ApplicationsPage(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Action Buttons
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
                                 // View Application Button
                                 Button(
                                     onClick = {
@@ -213,30 +213,30 @@ fun ApplicationsPage(
                                 // Status Update Buttons
                                 if (application.status == "Pending") {
                                     Row {
-                                        Button(
-                                            onClick = {
-                                                selectedApplication = application
-                                                selectedStatus = "Accepted"
-                                                showStatusDialog = true
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.Green
-                                            )
-                                        ) {
-                                            Text("Accept")
-                                        }
+                                    Button(
+                                        onClick = {
+                                            selectedApplication = application
+                                            selectedStatus = "Accepted"
+                                            showStatusDialog = true
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Green
+                                        )
+                                    ) {
+                                        Text("Accept")
+                                    }
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Button(
-                                            onClick = {
-                                                selectedApplication = application
-                                                selectedStatus = "Declined"
-                                                showStatusDialog = true
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.Red
-                                            )
-                                        ) {
-                                            Text("Decline")
+                                    Button(
+                                        onClick = {
+                                            selectedApplication = application
+                                            selectedStatus = "Declined"
+                                            showStatusDialog = true
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Red
+                                        )
+                                    ) {
+                                        Text("Decline")
                                         }
                                     }
                                 }

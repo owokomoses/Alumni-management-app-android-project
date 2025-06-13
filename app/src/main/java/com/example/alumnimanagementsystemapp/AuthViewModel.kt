@@ -27,6 +27,7 @@ class AuthViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val storageRef = FirebaseStorage.getInstance().reference
     val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private var lastSignupEmail: String? = null
 
 
 
@@ -114,6 +115,7 @@ class AuthViewModel : ViewModel() {
             _authState.postValue(AuthState.Error("Email or password can't be empty"))
             return
         }
+        lastSignupEmail = email
         _authState.postValue(AuthState.Loading)
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -367,6 +369,8 @@ class AuthViewModel : ViewModel() {
         // Don't set Unauthenticated state here to prevent automatic navigation
         // _authState.value = AuthState.Unauthenticated
     }
+
+    fun getLastSignupEmail(): String? = lastSignupEmail
 }
 
 sealed class AuthState {

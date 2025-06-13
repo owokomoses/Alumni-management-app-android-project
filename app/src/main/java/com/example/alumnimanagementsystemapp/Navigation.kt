@@ -67,6 +67,10 @@ fun Navigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel) {
             SignupPage(modifier, navController, authViewModel)
         }
 
+        composable("signupScreen") {
+            SignupScreen(navController = navController, authViewModel = authViewModel)
+        }
+
         composable(
             route = "verificationPage/{email}",
             arguments = listOf(navArgument("email") { type = NavType.StringType })

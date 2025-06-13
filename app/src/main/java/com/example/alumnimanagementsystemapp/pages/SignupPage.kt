@@ -57,8 +57,8 @@ fun SignupPage(
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.VerificationEmailSent -> {
-                // Navigate to verification page with email
-                navController.navigate("verificationPage/${email}") {
+                // Navigate to signup screen first
+                navController.navigate("signupScreen") {
                     popUpTo(Screen.Register.route) { inclusive = true }
                 }
             }
@@ -232,12 +232,12 @@ fun SignupPage(
                         color = Color.White
                     )
                 } else {
-                    Text(
-                        text = "Create Account",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                Text(
+                    text = "Create Account",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
                 }
             }
 

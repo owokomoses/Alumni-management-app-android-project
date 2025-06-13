@@ -40,9 +40,15 @@ fun SignupScreen(navController: NavController, authViewModel: AuthViewModel) {
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.VerificationEmailSent -> {
-                delay(1000) // Short delay to show the loading state
-                navController.navigate("verificationPage") {
-                    popUpTo("signupScreen") { inclusive = true }
+                delay(2000) // Show success screen for 2 seconds
+                val email = authViewModel.getLastSignupEmail()
+                if (email != null) {
+                    navController.navigate("verificationPage/$email") {
+                        popUpTo("signupScreen") { inclusive = true }
+                    }
+                } else {
+                    // If email is null for some reason, navigate back to signup
+                    navController.navigateUp()
                 }
             }
             is AuthState.Error -> {
