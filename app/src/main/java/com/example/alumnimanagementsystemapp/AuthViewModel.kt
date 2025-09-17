@@ -93,9 +93,9 @@ class AuthViewModel : ViewModel() {
                                     fetchProfileFromFirestore(user.uid)
                                 } else {
                                     // New user, save to Firestore
-                        saveUserToFirestore(user)
+                                    saveUserToFirestore(user)
                                 }
-                        _authState.value = AuthState.Authenticated
+                                _authState.value = AuthState.Authenticated
                             }
                     } else {
                         // Email not verified
@@ -109,36 +109,63 @@ class AuthViewModel : ViewModel() {
             }
     }
 
+    // Add this function to check email verification status
+    fun checkEmailVerification() {
+        try {
+            val user = auth.currentUser
+            if (user != null) {
+                user.reload().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        if (user.isEmailVerified) {
+                            // Email is verified; no need to sign in again
+                            fetchProfileFromFirestore(user.uid)
+                            _authState.postValue(AuthState.Authenticated)
+                        }
+                    } else {
+                        Log.e("AuthViewModel", "User reload failed: ${task.exception}")
+                    }
+                }
+            } else {
+                Log.e("AuthViewModel", "No current user during verification check")
+                _authState.postValue(AuthState.Error("No user found for verification"))
+            }
+        } catch (e: Exception) {
+            Log.e("AuthViewModel", "Error checking verification: ${e.message}")
+            _authState.postValue(AuthState.Error("Error checking verification status"))
+        }
+    }
 
     fun signup(email: String, password: String, displayName: String) {
         if (email.isEmpty() || password.isEmpty()) {
             _authState.postValue(AuthState.Error("Email or password can't be empty"))
             return
         }
-        lastSignupEmail = email
+        lastSignupEmail = email  // Store the email before signup
         _authState.postValue(AuthState.Loading)
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
+                    if (user == null) {
+                        _authState.postValue(AuthState.Error("Failed to create user"))
+                        return@addOnCompleteListener
+                    }
                     // Set the display name for the user
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(displayName)
                         .build()
 
-                    user?.updateProfile(profileUpdates)
-                        ?.addOnCompleteListener { profileUpdateTask ->
+                    user.updateProfile(profileUpdates)
+                        .addOnCompleteListener { profileUpdateTask ->
                             if (profileUpdateTask.isSuccessful) {
                                 // Save user info to Firestore
                                 saveUserToFirestore(user)
                                 // Send verification email
-                                user?.sendEmailVerification()
-                                    ?.addOnCompleteListener { verificationTask ->
+                                user.sendEmailVerification()
+                                    .addOnCompleteListener { verificationTask ->
                                         if (verificationTask.isSuccessful) {
                                             Log.d("AuthViewModel", "Verification email sent successfully")
-                                            // Sign out before setting verification state
-                                            auth.signOut()
-                                            // Set verification state after signout
+                                            // Don't sign out, just set verification state
                                             _authState.postValue(AuthState.VerificationEmailSent)
                                         } else {
                                             Log.e("AuthViewModel", "Failed to send verification email: ${verificationTask.exception}")
@@ -237,13 +264,9 @@ class AuthViewModel : ViewModel() {
         if (userId.isEmpty()) return
         
         db.collection("profiles").document(userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Log.w(TAG, "Error listening for profile updates: ", error)
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null && snapshot.exists()) {
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
                     val profile = snapshot.toObject(UserProfile::class.java)
                     if (profile != null) {
                         _userProfileState.value = profile
@@ -284,6 +307,9 @@ class AuthViewModel : ViewModel() {
                             }
                     }
                 }
+            }
+            .addOnFailureListener { e ->
+                Log.e("AuthViewModel", "Error fetching profile: ${e.message}")
             }
     }
 

@@ -1,5 +1,6 @@
 package com.example.alumnimanagementsystemapp.pages
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,20 +38,50 @@ fun VerificationPage(
     authViewModel: AuthViewModel,
     email: String
 ) {
-    var verificationCode by remember { mutableStateOf("") }
     var isProcessing by remember { mutableStateOf(false) }
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
+    // Check email verification status periodically
+    LaunchedEffect(Unit) {
+        try {
+            while (true) {
+                authViewModel.checkEmailVerification()
+                delay(2000) // Check every 2 seconds
+            }
+        } catch (e: Exception) {
+            Log.e("VerificationPage", "Error in verification check: ${e.message}")
+        }
+    }
+
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Authenticated -> {
-                navController.navigate(Screen.Home.route) {
-                    popUpTo("verificationPage/{email}") { inclusive = true }
+                try {
+                    // Navigate to login page after successful verification
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                } catch (e: Exception) {
+                    Log.e("VerificationPage", "Navigation error: ${e.message}")
+                    try {
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    } catch (e2: Exception) {
+                        Log.e("VerificationPage", "Alternative navigation error: ${e2.message}")
+                    }
                 }
             }
             is AuthState.Error -> {
-                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+                val errorMessage = (authState.value as AuthState.Error).message
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 isProcessing = false
             }
             is AuthState.Loading -> {
@@ -94,7 +125,7 @@ fun VerificationPage(
             )
 
             Text(
-                text = "Please check your email for verification code",
+                text = "Please check your email and click the verification link",
                 fontSize = 16.sp,
                 color = Color.Gray,
                 modifier = Modifier.padding(top = 8.dp)
@@ -111,60 +142,20 @@ fun VerificationPage(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Verification Code Input
-            OutlinedTextField(
-                value = verificationCode,
-                onValueChange = { verificationCode = it },
-                label = { Text("Verification Code", color = Color.Gray) },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Red,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = Color.Red,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Verify Button
-            Button(
-                onClick = { /* Handle verification */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !isProcessing
-            ) {
-                if (isProcessing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White
-                    )
-                } else {
-                    Text(
-                        text = "Verify Email",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Resend Code Button
             TextButton(
-                onClick = { authViewModel.sendVerificationEmail() },
+                onClick = { 
+                    try {
+                        authViewModel.sendVerificationEmail()
+                    } catch (e: Exception) {
+                        Log.e("VerificationPage", "Error sending verification email: ${e.message}")
+                        Toast.makeText(context, "Failed to send verification email", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
             ) {
                 Text(
-                    text = "Resend Verification Code",
+                    text = "Resend Verification Email",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
