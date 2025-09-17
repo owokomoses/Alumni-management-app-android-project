@@ -118,8 +118,8 @@ class AuthViewModel : ViewModel() {
                     if (task.isSuccessful) {
                         if (user.isEmailVerified) {
                             // Email is verified; no need to sign in again
-                            fetchProfileFromFirestore(user.uid)
-                            _authState.postValue(AuthState.Authenticated)
+                                        fetchProfileFromFirestore(user.uid)
+                                        _authState.postValue(AuthState.Authenticated)
                         }
                     } else {
                         Log.e("AuthViewModel", "User reload failed: ${task.exception}")

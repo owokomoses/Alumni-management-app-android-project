@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import com.example.alumnimanagementsystemapp.AuthViewModel
 import com.example.alumnimanagementsystemapp.Screen
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,35 +37,58 @@ fun ApplicationsPage(
     var selectedStatus by remember { mutableStateOf("") }
     val db = FirebaseFirestore.getInstance()
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+    val profileState by authViewModel.userProfileState.collectAsState()
 
-    // Fetch applications
-    LaunchedEffect(Unit) {
-        db.collection("jobApplications")
-            .orderBy("appliedDate", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                
-                if (snapshot != null) {
-                    applications = snapshot.documents.mapNotNull { doc ->
-                        try {
-                            val data = doc.data ?: return@mapNotNull null
-                            JobApplication(
-                                id = doc.id,
-                                jobId = data["jobId"] as? String ?: "",
-                                applicantId = data["applicantId"] as? String ?: "",
-                                applicantName = data["applicantName"] as? String ?: "",
-                                applicantEmail = data["applicantEmail"] as? String ?: "",
-                                coverLetter = data["coverLetter"] as? String ?: "",
-                                resumeUrl = data["resumeUrl"] as? String ?: "",
-                                status = data["status"] as? String ?: "Pending",
-                                appliedDate = DateConverter.toDate(data["appliedDate"] as? com.google.firebase.Timestamp) ?: Date()
-                            )
-                        } catch (e: Exception) {
-                            null
-                        }
+    // Fetch applications depending on role
+    var listenerRegistration by remember { mutableStateOf<ListenerRegistration?>(null) }
+    
+    LaunchedEffect(profileState.role, authViewModel.currentUser?.uid) {
+        // Clear previous results and listener
+        listenerRegistration?.remove()
+        applications = emptyList()
+
+        val currentUserId = authViewModel.currentUser?.uid
+        if (currentUserId == null) {
+            return@LaunchedEffect
+        }
+
+        val query: Query = if (profileState.role == "admin") {
+            db.collection("jobApplications")
+        } else {
+            db.collection("jobApplications").whereEqualTo("applicantId", currentUserId)
+        }
+
+        listenerRegistration = query.addSnapshotListener { snapshot, error ->
+            if (error != null) return@addSnapshotListener
+            if (snapshot != null) {
+                val list = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        val data = doc.data ?: return@mapNotNull null
+                        JobApplication(
+                            id = doc.id,
+                            jobId = data["jobId"] as? String ?: "",
+                            applicantId = data["applicantId"] as? String ?: "",
+                            applicantName = data["applicantName"] as? String ?: "",
+                            applicantEmail = data["applicantEmail"] as? String ?: "",
+                            coverLetter = data["coverLetter"] as? String ?: "",
+                            resumeUrl = data["resumeUrl"] as? String ?: "",
+                            status = data["status"] as? String ?: "Pending",
+                            appliedDate = DateConverter.toDate(data["appliedDate"] as? com.google.firebase.Timestamp) ?: Date()
+                        )
+                    } catch (e: Exception) {
+                        null
                     }
                 }
+                applications = list.sortedByDescending { it.appliedDate }
             }
+        }
+    }
+
+    // Cleanup listener on dispose
+    DisposableEffect(Unit) {
+        onDispose {
+            listenerRegistration?.remove()
+        }
     }
 
     Screen(navController = navController, authViewModel = authViewModel) { paddingValues ->
@@ -83,12 +108,26 @@ fun ApplicationsPage(
             )
 
             // Applications List
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(applications) { application ->
+            if (applications.isEmpty()) {
+                // Show message when no applications
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (profileState.role == "admin") "No job applications found" else "You haven't applied to any jobs yet",
+                        fontSize = 16.sp,
+                        color = Color.Gray,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(applications) { application ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
@@ -108,31 +147,33 @@ fun ApplicationsPage(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column {
-                            Text(
-                                text = application.applicantName,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                            Text(
-                                text = application.applicantEmail,
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
+                                    Text(
+                                        text = application.applicantName,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Red
+                                    )
+                                    Text(
+                                        text = application.applicantEmail,
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
                                 }
 
-                                // Delete Icon Button
-                                IconButton(
-                                    onClick = {
-                                        selectedApplication = application
-                                        showDeleteDialog = true
+                                // Delete Icon Button - Only show for admin or application owner
+                                if (profileState.role == "admin" || application.applicantId == authViewModel.currentUser?.uid) {
+                                    IconButton(
+                                        onClick = {
+                                            selectedApplication = application
+                                            showDeleteDialog = true
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Delete,
+                                            contentDescription = "Delete",
+                                            tint = Color.Red
+                                        )
                                     }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Delete,
-                                        contentDescription = "Delete",
-                                        tint = Color.Red
-                                    )
                                 }
                             }
 
@@ -194,10 +235,10 @@ fun ApplicationsPage(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Action Buttons
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
                                 // View Application Button
                                 Button(
                                     onClick = {
@@ -210,33 +251,33 @@ fun ApplicationsPage(
                                     Text("View Application")
                                 }
 
-                                // Status Update Buttons
-                                if (application.status == "Pending") {
+                                // Status Update Buttons - Only show for admin
+                                if (profileState.role == "admin" && application.status == "Pending") {
                                     Row {
-                                    Button(
-                                        onClick = {
-                                            selectedApplication = application
-                                            selectedStatus = "Accepted"
-                                            showStatusDialog = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.Green
-                                        )
-                                    ) {
-                                        Text("Accept")
-                                    }
+                                        Button(
+                                            onClick = {
+                                                selectedApplication = application
+                                                selectedStatus = "Accepted"
+                                                showStatusDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Green
+                                            )
+                                        ) {
+                                            Text("Accept")
+                                        }
                                         Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        onClick = {
-                                            selectedApplication = application
-                                            selectedStatus = "Declined"
-                                            showStatusDialog = true
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.Red
-                                        )
-                                    ) {
-                                        Text("Decline")
+                                        Button(
+                                            onClick = {
+                                                selectedApplication = application
+                                                selectedStatus = "Declined"
+                                                showStatusDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Red
+                                            )
+                                        ) {
+                                            Text("Decline")
                                         }
                                     }
                                 }
@@ -361,4 +402,5 @@ fun ApplicationsPage(
             textContentColor = Color.Gray
         )
     }
-} 
+}
+}
