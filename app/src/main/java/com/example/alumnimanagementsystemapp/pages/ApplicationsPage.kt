@@ -41,7 +41,7 @@ fun ApplicationsPage(
 
     // Fetch applications depending on role
     var listenerRegistration by remember { mutableStateOf<ListenerRegistration?>(null) }
-    
+
     LaunchedEffect(profileState.role, authViewModel.currentUser?.uid) {
         // Clear previous results and listener
         listenerRegistration?.remove()
@@ -128,156 +128,157 @@ fun ApplicationsPage(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(applications) { application ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFF5F5F5)
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFF5F5F5)
+                            )
                         ) {
-                            // Header with applicant info and delete button
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
                             ) {
-                                Column {
-                                    Text(
-                                        text = application.applicantName,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Red
-                                    )
-                                    Text(
-                                        text = application.applicantEmail,
-                                        fontSize = 14.sp,
-                                        color = Color.Gray
-                                    )
-                                }
-
-                                // Delete Icon Button - Only show for admin or application owner
-                                if (profileState.role == "admin" || application.applicantId == authViewModel.currentUser?.uid) {
-                                    IconButton(
-                                        onClick = {
-                                            selectedApplication = application
-                                            showDeleteDialog = true
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Delete,
-                                            contentDescription = "Delete",
-                                            tint = Color.Red
+                                // Header with applicant info and delete button
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = application.applicantName,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red
+                                        )
+                                        Text(
+                                            text = application.applicantEmail,
+                                            fontSize = 14.sp,
+                                            color = Color.Gray
                                         )
                                     }
+
+                                    // Delete Icon Button - Only show for admin or application owner
+                                    if (profileState.role == "admin" || application.applicantId == authViewModel.currentUser?.uid) {
+                                        IconButton(
+                                            onClick = {
+                                                selectedApplication = application
+                                                showDeleteDialog = true
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Delete,
+                                                contentDescription = "Delete",
+                                                tint = Color.Red
+                                            )
+                                        }
+                                    }
                                 }
-                            }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Cover Letter Preview
-                            Text(
-                                text = "Cover Letter",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                            Text(
-                                text = application.coverLetter.take(100) + if (application.coverLetter.length > 100) "..." else "",
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Resume Link
-                            Text(
-                                text = "Resume",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                            Text(
-                                text = application.resumeUrl,
-                                fontSize = 14.sp,
-                                color = Color.Blue
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Application Date and Status
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                                // Cover Letter Preview
                                 Text(
-                                    text = "Applied: ${dateFormat.format(application.appliedDate)}",
+                                    text = "Cover Letter",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
+                                Text(
+                                    text = application.coverLetter.take(100) + if (application.coverLetter.length > 100) "..." else "",
                                     fontSize = 14.sp,
                                     color = Color.Gray
                                 )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Resume Link
                                 Text(
-                                    text = application.status,
-                                    fontSize = 14.sp,
-                                    color = when (application.status) {
-                                        "Accepted" -> Color.Green
-                                        "Declined" -> Color.Red
-                                        else -> Color.Gray
-                                    },
-                                    fontWeight = FontWeight.Medium
+                                    text = "Resume",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
                                 )
-                            }
+                                Text(
+                                    text = application.resumeUrl,
+                                    fontSize = 14.sp,
+                                    color = Color.Blue
+                                )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
-                            // Action Buttons
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                // View Application Button
-                                Button(
-                                    onClick = {
-                                        navController.navigate("view_application/${application.id}")
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Red
-                                    )
+                                // Application Date and Status
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("View Application")
+                                    Text(
+                                        text = "Applied: ${dateFormat.format(application.appliedDate)}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
+                                    Text(
+                                        text = application.status,
+                                        fontSize = 14.sp,
+                                        color = when (application.status) {
+                                            "Accepted" -> Color.Green
+                                            "Declined" -> Color.Red
+                                            else -> Color.Gray
+                                        },
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 }
 
-                                // Status Update Buttons - Only show for admin
-                                if (profileState.role == "admin" && application.status == "Pending") {
-                                    Row {
-                                        Button(
-                                            onClick = {
-                                                selectedApplication = application
-                                                selectedStatus = "Accepted"
-                                                showStatusDialog = true
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.Green
-                                            )
-                                        ) {
-                                            Text("Accept")
-                                        }
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Button(
-                                            onClick = {
-                                                selectedApplication = application
-                                                selectedStatus = "Declined"
-                                                showStatusDialog = true
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.Red
-                                            )
-                                        ) {
-                                            Text("Decline")
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Action Buttons
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    // View Application Button
+                                    Button(
+                                        onClick = {
+                                            navController.navigate("view_application/${application.id}")
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Red
+                                        )
+                                    ) {
+                                        Text("View Application")
+                                    }
+
+                                    // Status Update Buttons - Only show for admin
+                                    if (profileState.role == "admin" && application.status == "Pending") {
+                                        Row {
+                                            Button(
+                                                onClick = {
+                                                    selectedApplication = application
+                                                    selectedStatus = "Accepted"
+                                                    showStatusDialog = true
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color.Green
+                                                )
+                                            ) {
+                                                Text("Accept")
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Button(
+                                                onClick = {
+                                                    selectedApplication = application
+                                                    selectedStatus = "Declined"
+                                                    showStatusDialog = true
+                                                },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = Color.Red
+                                                )
+                                            ) {
+                                                Text("Decline")
+                                            }
                                         }
                                     }
                                 }
@@ -287,120 +288,119 @@ fun ApplicationsPage(
                 }
             }
         }
-    }
 
-    // Status Update Dialog
-    if (showStatusDialog && selectedApplication != null) {
-        AlertDialog(
-            onDismissRequest = {
-                showStatusDialog = false
-                selectedApplication = null
-            },
-            title = {
-                Text(
-                    "Update Application Status",
-                    color = Color.Red,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    "Are you sure you want to ${selectedStatus.lowercase()} this application?",
-                    color = Color.Gray
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        selectedApplication?.let { application ->
-                            db.collection("jobApplications")
-                                .document(application.id)
-                                .update("status", selectedStatus)
-                                .addOnSuccessListener {
-                                    showStatusDialog = false
-                                    selectedApplication = null
-                                }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedStatus == "Accepted") Color.Green else Color.Red
+        // Status Update Dialog
+        if (showStatusDialog && selectedApplication != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showStatusDialog = false
+                    selectedApplication = null
+                },
+                title = {
+                    Text(
+                        "Update Application Status",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                ) {
-                    Text(selectedStatus)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showStatusDialog = false
-                        selectedApplication = null
+                },
+                text = {
+                    Text(
+                        "Are you sure you want to ${selectedStatus.lowercase()} this application?",
+                        color = Color.Gray
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            selectedApplication?.let { application ->
+                                db.collection("jobApplications")
+                                    .document(application.id)
+                                    .update("status", selectedStatus)
+                                    .addOnSuccessListener {
+                                        showStatusDialog = false
+                                        selectedApplication = null
+                                    }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (selectedStatus == "Accepted") Color.Green else Color.Red
+                        )
+                    ) {
+                        Text(selectedStatus)
                     }
-                ) {
-                    Text("Cancel", color = Color.Red)
-                }
-            },
-            containerColor = Color.White,
-            titleContentColor = Color.Red,
-            textContentColor = Color.Gray
-        )
-    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showStatusDialog = false
+                            selectedApplication = null
+                        }
+                    ) {
+                        Text("Cancel", color = Color.Red)
+                    }
+                },
+                containerColor = Color.White,
+                titleContentColor = Color.Red,
+                textContentColor = Color.Gray
+            )
+        }
 
-    // Delete Confirmation Dialog
-    if (showDeleteDialog && selectedApplication != null) {
-        AlertDialog(
-            onDismissRequest = {
-                showDeleteDialog = false
-                selectedApplication = null
-            },
-            title = {
-                Text(
-                    "Delete Application",
-                    color = Color.Red,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    "Are you sure you want to delete this application?",
-                    color = Color.Gray
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        selectedApplication?.let { application ->
-                            db.collection("jobApplications")
-                                .document(application.id)
-                                .delete()
-                                .addOnSuccessListener {
-                                    showDeleteDialog = false
-                                    selectedApplication = null
-                                }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
+        // Delete Confirmation Dialog
+        if (showDeleteDialog && selectedApplication != null) {
+            AlertDialog(
+                onDismissRequest = {
+                    showDeleteDialog = false
+                    selectedApplication = null
+                },
+                title = {
+                    Text(
+                        "Delete Application",
+                        color = Color.Red,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        selectedApplication = null
+                },
+                text = {
+                    Text(
+                        "Are you sure you want to delete this application?",
+                        color = Color.Gray
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            selectedApplication?.let { application ->
+                                db.collection("jobApplications")
+                                    .document(application.id)
+                                    .delete()
+                                    .addOnSuccessListener {
+                                        showDeleteDialog = false
+                                        selectedApplication = null
+                                    }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red
+                        )
+                    ) {
+                        Text("Delete")
                     }
-                ) {
-                    Text("Cancel", color = Color.Red)
-                }
-            },
-            containerColor = Color.White,
-            titleContentColor = Color.Red,
-            textContentColor = Color.Gray
-        )
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showDeleteDialog = false
+                            selectedApplication = null
+                        }
+                    ) {
+                        Text("Cancel", color = Color.Red)
+                    }
+                },
+                containerColor = Color.White,
+                titleContentColor = Color.Red,
+                textContentColor = Color.Gray
+            )
+        }
     }
-}
 }
